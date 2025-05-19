@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import pool from "../../db/db";
+import pool from "../db/db";
 import asyncHandler from "../middlewares/asyncHandler";
 
 const router = express.Router();

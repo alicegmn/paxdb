@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import pool from "../../db/db";
+import pool from "../db/db";
 import asyncHandler from "../middlewares/asyncHandler";
 import { JwtPayload } from "jsonwebtoken";
 const router = express.Router();

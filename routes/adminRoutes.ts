@@ -2,8 +2,8 @@ import express from "express";
 import authenticateToken, {
   AuthenticatedRequest,
 } from "../middlewares/authMiddleware.ts";
-import requireRole from "../middlewares/requireRole";
-import asyncHandler from "../middlewares/asyncHandler";
+import requireRole from "../middlewares/requireRole.ts";
+import asyncHandler from "../middlewares/asyncHandler.ts";
 
 const router = express.Router();
 
