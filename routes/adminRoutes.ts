@@ -1,9 +1,9 @@
 import express from "express";
 import authenticateToken, {
   AuthenticatedRequest,
-} from "../middlewares/authMiddleware.ts";
-import requireRole from "../middlewares/requireRole.ts";
-import asyncHandler from "../middlewares/asyncHandler.ts";
+} from "../middlewares/authMiddleware";
+import requireRole from "../middlewares/requireRole";
+import asyncHandler from "../middlewares/asyncHandler";
 
 const router = express.Router();
 

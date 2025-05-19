@@ -8,7 +8,15 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowJs": true
   },
-  "include": ["api/**/*", "db/**/*", "scripts/**/*", "swagger/**/*"]
+  "include": [
+    "app.ts",
+    "api/**/*",
+    "db/**/*",
+    "middlewares/**/*",
+    "routes/**/*",
+    "swagger/**/*"
+  ]
 }

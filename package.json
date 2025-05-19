@@ -4,9 +4,9 @@
   "description": "API för automatiska rumsbokningar via sensordata. Gruppmedlemmar: SUVX24: Jennifer Gott, Sabina Stawbrink, Oscar Asserlund, Erik Dahl, Johan Modin. FMWX24: Hannah Bärlin, Hanna Kindholm, Tova Hansen. FJSX24: Alice Eriksson, Phithai Lai, Dennis Granheimer, Rhiannon Brönnimann.",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only app.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/app.js",
     "setup-db": "ts-node scripts/setupDb.ts",
     "teardown-db": "ts-node scripts/teardownDb.ts"
   },
@@ -30,10 +30,10 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",
     "ps": "^1.0.0",
-    "serverless-http": "^3.2.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "yaml": "^2.7.1"
+    "yaml": "^2.7.1",
+    "serverless-http": "^3.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
