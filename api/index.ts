@@ -30,19 +30,19 @@ app.use(
 );
 
 // routes
-// import userRoutes from "./routes/users";
+import userRoutes from "./routes/users";
 // import roomRoutes from "./routes/rooms";
 // import bookingRoutes from "./routes/bookings";
 // import authRoutes from "./routes/authRoutes";
 // app.use("/auth", authRoutes);
-// app.use("/users", userRoutes);
+app.use("/users", userRoutes);
 // app.use("/rooms", roomRoutes);
 // app.use("/bookings", bookingRoutes);
 
 app.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
-    return res.send("PAX API is running!");
+    return res.send("Welcome to the PAX API and database!");
   })
 );
 

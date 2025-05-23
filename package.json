@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/Kusten-ar-klar-Chas-Challenge-2025/pax#readme",
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
