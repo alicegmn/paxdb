@@ -11,7 +11,7 @@
     },
     {
       "description": "Mock server",
-      "url": "https://virtserver.swaggerhub.com/alicegmn/pax-api/dev-oas3"
+      "url": "https://virtserver.swaggerhub.com/alicegmn/pax-api/dev-oas3-new"
     }
   ],
   "paths": {

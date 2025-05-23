@@ -5,10 +5,15 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger/export-swagger";
 import cors from "cors";
 import limiter from "./middlewares/rateLimiter";
-import { Request, Response } from "express";
 import errorHandler from "./middlewares/errorHandler";
 import bcrypt from "bcryptjs";
 import asyncHandler from "./middlewares/asyncHandler";
+import YAML from "yamljs";
+import path from "path";
+
+const swaggerDocument = YAML.load(
+  path.join(__dirname, "../swagger/swagger.yaml")
+);
 
 console.log("Index.ts is running");
 
@@ -50,8 +55,7 @@ import testRoutes from "./routes/test";
 app.use("/test", testRoutes);
 app.use(errorHandler);
 
-// // Swagger route
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/documentation", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // app.get("/setup", async (_req: Request, res: Response) => {
 //   console.log("setup starting");

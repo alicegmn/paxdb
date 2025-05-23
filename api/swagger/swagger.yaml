@@ -1,0 +1,668 @@
+openapi: 3.0.0
+info:
+  title: PAX API
+  version: 1.0.0
+  description: Unified API documentation for the PAX room booking system
+paths:
+  /dashboard:
+    get:
+      summary: Access admin dashboard
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard access granted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Welcome to the admin dashboard
+                  user:
+                    type: object
+        "401":
+          description: Unauthorized – missing or invalid token
+        "403":
+          description: Forbidden – insufficient permissions
+        "500":
+          description: Internal server error
+
+  /:
+    get:
+      summary: Test API connectivity
+      tags:
+        - Root
+      responses:
+        "200":
+          description: Success – API is responding
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test:
+                    type: string
+                    example: hej vi har kontakt
+  /device-config/{serialNumber}:
+    post:
+      summary: Register a device
+      tags: [DeviceConfig]
+      parameters:
+        - in: path
+          name: serialNumber
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Device registered successfully
+        "400":
+          description: Invalid serial number
+        "500":
+          description: Server error
+
+    put:
+      summary: Assign a room to a device
+      tags: [DeviceConfig]
+      parameters:
+        - in: path
+          name: serialNumber
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - room_id
+              properties:
+                room_id:
+                  type: integer
+      responses:
+        "200":
+          description: Room assigned to device
+        "400":
+          description: Invalid input
+        "500":
+          description: Server error
+
+    get:
+      summary: Get configuration for a device
+      tags: [DeviceConfig]
+      parameters:
+        - in: path
+          name: serialNumber
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Device configuration retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device:
+                    type: object
+                  room:
+                    type: object
+        "404":
+          description: Device not found
+        "500":
+          description: Server error
+  /users:
+    get:
+      summary: Get all users
+      tags:
+        - Users
+      responses:
+        "200":
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "500":
+          description: Error fetching users
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserInput"
+      responses:
+        "201":
+          description: User created successfully
+        "500":
+          description: Error creating user
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+        "500":
+          description: Error fetching user
+    put:
+      summary: Update a user
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User updated successfully
+        "404":
+          description: User not found
+        "500":
+          description: Error updating user
+    delete:
+      summary: Delete a user
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+        "500":
+          description: Error deleting user
+
+  /rooms:
+    get:
+      summary: Get all rooms
+      tags:
+        - Rooms
+      responses:
+        "200":
+          description: A list of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+        "500":
+          description: Internal server error
+    post:
+      summary: Create a new room
+      tags:
+        - Rooms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomInput"
+      responses:
+        "201":
+          description: Room created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "500":
+          description: Error creating room
+
+  /rooms/{id}:
+    get:
+      summary: Get a room by ID
+      tags:
+        - Rooms
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "404":
+          description: Room not found
+        "500":
+          description: Internal server error
+    put:
+      summary: Update a room
+      tags:
+        - Rooms
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomInput"
+      responses:
+        "200":
+          description: Room updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "404":
+          description: Room not found
+        "500":
+          description: Internal server error
+    delete:
+      summary: Delete a room
+      tags:
+        - Rooms
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  room:
+                    $ref: "#/components/schemas/Room"
+        "404":
+          description: Room not found
+        "500":
+          description: Internal server error
+
+  /bookings:
+    get:
+      summary: Get all bookings with room name and user email
+      tags:
+        - Bookings
+      responses:
+        "200":
+          description: A list of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookingWithRelations"
+        "500":
+          description: Internal server error
+    post:
+      summary: Create a new booking
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "201":
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Invalid room_id or user_id
+        "500":
+          description: Internal server error
+
+  /bookings/{id}:
+    get:
+      summary: Get a booking by ID
+      tags:
+        - Bookings
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Booking not found
+        "500":
+          description: Internal server error
+    put:
+      summary: Update a booking
+      tags:
+        - Bookings
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "200":
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Invalid room_id or user_id
+        "404":
+          description: Booking not found
+        "500":
+          description: Internal server error
+    delete:
+      summary: Delete a booking
+      tags:
+        - Bookings
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Booking deleted successfully
+        "404":
+          description: Booking not found
+        "500":
+          description: Internal server error
+
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSuccessResponse"
+        "400":
+          description: Invalid role
+        "409":
+          description: Email already registered
+        "500":
+          description: Registration failed
+
+  /auth/login:
+    post:
+      summary: Authenticate user and return JWT
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthSuccessResponse"
+        "401":
+          description: Invalid login credentials
+        "500":
+          description: Login failed
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+    CreateUserInput:
+      type: object
+      required:
+        - name
+        - surname
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        available:
+          type: boolean
+        air_quality:
+          type: number
+        screen:
+          type: boolean
+        floor:
+          type: integer
+        chairs:
+          type: integer
+        whiteboard:
+          type: boolean
+        projector:
+          type: boolean
+    CreateRoomInput:
+      type: object
+      required:
+        - name
+        - description
+        - available
+        - air_quality
+        - screen
+        - floor
+        - chairs
+        - whiteboard
+        - projector
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        available:
+          type: boolean
+        air_quality:
+          type: number
+        screen:
+          type: boolean
+        floor:
+          type: integer
+        chairs:
+          type: integer
+        whiteboard:
+          type: boolean
+        projector:
+          type: boolean
+    Booking:
+      type: object
+      required:
+        - room_id
+        - user_id
+        - start_time
+        - end_time
+      properties:
+        id:
+          type: integer
+        room_id:
+          type: integer
+        user_id:
+          type: integer
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+    BookingWithRelations:
+      type: object
+      properties:
+        id:
+          type: integer
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        room_name:
+          type: string
+        user_email:
+          type: string
+    RegisterInput:
+      type: object
+      required:
+        - email
+        - password
+        - name
+        - surname
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+            - moderator
+    LoginInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    AuthSuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        token:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+            name:
+              type: string
+            surname:
+              type: string
+            role:
+              type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
