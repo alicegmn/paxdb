@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:13000"
+      "url": "https://paxdb.vercel.app"
     },
     {
       "description": "Mock server",
@@ -17,9 +17,7 @@
   "paths": {
     "/auth/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register a new user",
         "requestBody": {
           "required": true,
@@ -36,17 +34,10 @@
                   },
                   "role": {
                     "type": "string",
-                    "enum": [
-                      "admin",
-                      "user",
-                      "moderator"
-                    ]
+                    "enum": ["admin", "user", "moderator"]
                   }
                 },
-                "required": [
-                  "username",
-                  "password"
-                ]
+                "required": ["username", "password"]
               }
             }
           }
@@ -95,9 +86,7 @@
     },
     "/auth/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Login user",
         "requestBody": {
           "required": true,
@@ -113,10 +102,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "username",
-                  "password"
-                ]
+                "required": ["username", "password"]
               }
             }
           }
@@ -152,9 +138,7 @@
     "/bookings": {
       "get": {
         "summary": "Get all bookings with room name and user email",
-        "tags": [
-          "Bookings"
-        ],
+        "tags": ["Bookings"],
         "responses": {
           "200": {
             "description": "A list of bookings",
@@ -176,9 +160,7 @@
       },
       "post": {
         "summary": "Create a new booking",
-        "tags": [
-          "Bookings"
-        ],
+        "tags": ["Bookings"],
         "requestBody": {
           "required": true,
           "content": {
@@ -212,9 +194,7 @@
     "/bookings/{id}": {
       "get": {
         "summary": "Get a booking by ID",
-        "tags": [
-          "Bookings"
-        ],
+        "tags": ["Bookings"],
         "parameters": [
           {
             "in": "path",
@@ -244,9 +224,7 @@
       },
       "put": {
         "summary": "Update a booking by ID",
-        "tags": [
-          "Bookings"
-        ],
+        "tags": ["Bookings"],
         "parameters": [
           {
             "in": "path",
@@ -292,9 +270,7 @@
       },
       "delete": {
         "summary": "Delete a booking by ID",
-        "tags": [
-          "Bookings"
-        ],
+        "tags": ["Bookings"],
         "parameters": [
           {
             "in": "path",
@@ -322,9 +298,7 @@
     "/rooms": {
       "get": {
         "summary": "Get all rooms",
-        "tags": [
-          "Rooms"
-        ],
+        "tags": ["Rooms"],
         "responses": {
           "200": {
             "description": "A list of rooms",
@@ -346,9 +320,7 @@
       },
       "post": {
         "summary": "Create a new room",
-        "tags": [
-          "Rooms"
-        ],
+        "tags": ["Rooms"],
         "requestBody": {
           "required": true,
           "content": {
@@ -379,9 +351,7 @@
     "/rooms/{id}": {
       "get": {
         "summary": "Get a room by ID",
-        "tags": [
-          "Rooms"
-        ],
+        "tags": ["Rooms"],
         "parameters": [
           {
             "in": "path",
@@ -413,9 +383,7 @@
       },
       "put": {
         "summary": "Update a room",
-        "tags": [
-          "Rooms"
-        ],
+        "tags": ["Rooms"],
         "parameters": [
           {
             "in": "path",
@@ -457,9 +425,7 @@
       },
       "delete": {
         "summary": "Delete a room",
-        "tags": [
-          "Rooms"
-        ],
+        "tags": ["Rooms"],
         "parameters": [
           {
             "in": "path",
@@ -501,9 +467,7 @@
     "/users": {
       "get": {
         "summary": "Get all users",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "responses": {
           "200": {
             "description": "A list of users",
@@ -525,9 +489,7 @@
       },
       "post": {
         "summary": "Create a new user",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "requestBody": {
           "required": true,
           "content": {
@@ -551,9 +513,7 @@
     "/users/{id}": {
       "get": {
         "summary": "Get a user by ID",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -585,9 +545,7 @@
       },
       "put": {
         "summary": "Update a user",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -622,9 +580,7 @@
       },
       "delete": {
         "summary": "Delete a user",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "parameters": [
           {
             "in": "path",
@@ -810,12 +766,7 @@
       },
       "CreateUserInput": {
         "type": "object",
-        "required": [
-          "firstname",
-          "lastname",
-          "email",
-          "password"
-        ],
+        "required": ["firstname", "lastname", "email", "password"],
         "properties": {
           "firstname": {
             "type": "string"
