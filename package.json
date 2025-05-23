@@ -20,12 +20,10 @@
   },
   "homepage": "https://github.com/Kusten-ar-klar-Chas-Challenge-2025/pax#readme",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "express-rate-limit": "^6.11.2",
-    "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",
     "ps": "^1.0.0",
     "serverless-http": "^3.2.0",
