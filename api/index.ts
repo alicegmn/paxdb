@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 // import pool from "./db";
 // import swaggerUi from "swagger-ui-express";
@@ -8,6 +8,7 @@ import cors from "cors";
 // import { Request, Response } from "express";
 import errorHandler from "./middlewares/errorHandler";
 // import bcrypt from "bcryptjs";
+import asyncHandler from "./middlewares/asyncHandler";
 
 console.log("Index.ts is running");
 
@@ -37,6 +38,14 @@ app.use(
 // app.use("/users", userRoutes);
 // app.use("/rooms", roomRoutes);
 // app.use("/bookings", bookingRoutes);
+
+app.get(
+  "/",
+  asyncHandler(async (_req: Request, res: Response) => {
+    return res.send("PAX API is running!");
+  })
+);
+
 import testRoutes from "./routes/test";
 app.use("/test", testRoutes);
 app.use(errorHandler);
