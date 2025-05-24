@@ -29,10 +29,12 @@ app.use(
 );
 
 // routes
+import setupRoutes from "./routes/setup";
 import userRoutes from "./routes/users";
 import roomRoutes from "./routes/rooms";
 import bookingRoutes from "./routes/bookings";
 import authRoutes from "./routes/authRoutes";
+app.use("/", setupRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
