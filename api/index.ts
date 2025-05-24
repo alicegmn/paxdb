@@ -49,6 +49,18 @@ import testRoutes from "./routes/test";
 app.use("/test", testRoutes);
 app.use(errorHandler);
 
+app.get("/test-db", async (_req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({ success: true, time: result.rows[0].now });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, error: "Database connection failed" });
+  }
+});
+
 // app.get("/setup", async (_req: Request, res: Response) => {
 //   console.log("setup starting");
 //   try {
@@ -130,10 +142,5 @@ if (process.env.NODE_ENV !== "production") {
   console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
   console.log("DB_PORT:", process.env.DB_PORT);
 }
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-  // console.log(`Swagger docs: http://localhost:${port}/api-docs`);
-});
 
 export default app; // Export for testing
