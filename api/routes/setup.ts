@@ -1,6 +1,6 @@
-// routes/setup.ts
 import express, { Request, Response } from "express";
 import pool from "../db";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -60,8 +60,26 @@ router.get("/setup", async (_req: Request, res: Response) => {
       );
     `);
 
+    // Create default admin if not exists
+    const adminEmail = "admin@pax.com";
+    const adminCheck = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [adminEmail]
+    );
+    if (adminCheck.rows.length === 0) {
+      const hashedPassword = await bcrypt.hash("admin123", 10);
+      await pool.query(
+        `INSERT INTO users (name, surname, email, password, role)
+         VALUES ($1, $2, $3, $4, $5)`,
+        ["Admin", "User", adminEmail, hashedPassword, "admin"]
+      );
+      console.log("✅ Default admin user created (admin@pax.com / admin123)");
+    }
+
     console.log("✅ Tables created (if not already existing).");
-    res.status(200).send("✅ Setup complete: Tables created or verified.");
+    res
+      .status(200)
+      .send("✅ Setup complete: Tables created and default admin checked.");
   } catch (err) {
     console.error("❌ Setup error:", err);
     res.status(500).send("❌ Setup failed. See server logs.");
