@@ -30,13 +30,13 @@ app.use(
 
 // routes
 import userRoutes from "./routes/users";
-// import roomRoutes from "./routes/rooms";
-// import bookingRoutes from "./routes/bookings";
-// import authRoutes from "./routes/authRoutes";
-// app.use("/auth", authRoutes);
+import roomRoutes from "./routes/rooms";
+import bookingRoutes from "./routes/bookings";
+import authRoutes from "./routes/authRoutes";
+app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
-// app.use("/rooms", roomRoutes);
-// app.use("/bookings", bookingRoutes);
+app.use("/rooms", roomRoutes);
+app.use("/bookings", bookingRoutes);
 
 app.get(
   "/",
