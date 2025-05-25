@@ -1,15 +1,14 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import pool from "./db";
-// import swaggerUi from "swagger-ui-express";
+import swaggerUi from "swagger-ui-express";
 import cors from "cors";
 import limiter from "./middlewares/rateLimiter";
 import errorHandler from "./middlewares/errorHandler";
 import bcrypt from "bcryptjs";
 import asyncHandler from "./middlewares/asyncHandler";
+import YAML from "yamljs";
 import path from "path";
-
-console.log("Index.ts is running");
 
 dotenv.config();
 
@@ -17,7 +16,7 @@ const app = express();
 
 const port = process.env.PORT || 13000;
 
-app.use(express.json()); // for parsing application/json
+app.use(express.json());
 
 app.use(limiter); // allows limiter on all routes
 // allow requests from frontend (localhost:5173)
@@ -27,6 +26,8 @@ app.use(
     credentials: true,
   })
 );
+
+const swaggerDocument = YAML.load(path.join(__dirname, "./swagger.yaml"));
 
 // routes
 import setupRoutes from "./routes/setup";
@@ -39,6 +40,8 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/bookings", bookingRoutes);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get(
   "/",
