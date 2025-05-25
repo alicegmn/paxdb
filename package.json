@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only api/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "build-docs": "ts-node swagger/export-swagger.ts",
+    "export-docs": "ts-node swagger/export-swagger.ts"
   },
   "repository": {
     "type": "git",

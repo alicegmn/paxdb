@@ -6,18 +6,14 @@ import limiter from "./middlewares/rateLimiter";
 import errorHandler from "./middlewares/errorHandler";
 import bcrypt from "bcryptjs";
 import asyncHandler from "./middlewares/asyncHandler";
-import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "./swagger/swagger";
 
-// Använd Swagger CDN för JS och CSS (för att det ska funka i prod på Vercel)
-const swaggerOptions = {
-  customCssUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css",
-  customJs: [
-    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js",
-  ],
-};
+// routes
+import setupRoutes from "./routes/setup";
+import userRoutes from "./routes/users";
+import roomRoutes from "./routes/rooms";
+import bookingRoutes from "./routes/bookings";
+import authRoutes from "./routes/authRoutes";
+import docsRoutes from "./routes/docs";
 
 dotenv.config();
 
@@ -36,14 +32,8 @@ app.use(
   })
 );
 
-// routes
-import setupRoutes from "./routes/setup";
-import userRoutes from "./routes/users";
-import roomRoutes from "./routes/rooms";
-import bookingRoutes from "./routes/bookings";
-import authRoutes from "./routes/authRoutes";
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", setupRoutes);
+app.use("/docs", docsRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
@@ -52,7 +42,7 @@ app.use("/bookings", bookingRoutes);
 app.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
-    return res.send("Welcome to the PAX API and database!");
+    return res.send("Welcome to the PAX API and database go to https://!");
   })
 );
 
@@ -142,7 +132,6 @@ app.get("/test-db", async (_req, res) => {
 
 // app.listen(port, () => {
 //   console.log(`Server listening on port ${port}`);
-//   console.log(`Swagger docs: http://localhost:${port}/api-docs`);
 // });
 
 //only in dev mode

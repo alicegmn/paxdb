@@ -1,0 +1,137 @@
+{
+  "title": "PAX API Documentation",
+  "version": "1.0.0",
+  "description": "REST API för det automatiserade rumsbokningssystemet PAX",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/",
+      "description": "Testar API-anslutning – returnerar en välkomsttext"
+    },
+    {
+      "method": "GET",
+      "path": "/setup",
+      "description": "Skapar databastabeller och default admin om de inte finns"
+    },
+    {
+      "method": "GET",
+      "path": "/test",
+      "description": "Returnerar testdata (används för frontendkontroll)"
+    },
+    {
+      "method": "GET",
+      "path": "/test-db",
+      "description": "Testar databasanslutning – returnerar nuvarande tid"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/register",
+      "description": "Registrera ny användare"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "description": "Logga in och få JWT-token"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/create-first-admin",
+      "description": "Skapar första admin-användaren (för utveckling/test)"
+    },
+    {
+      "method": "GET",
+      "path": "/dashboard",
+      "description": "Endast för admins – visar användarens JWT-data"
+    },
+    {
+      "method": "GET",
+      "path": "/users",
+      "description": "Hämtar alla användare"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:id",
+      "description": "Hämtar en användare baserat på ID"
+    },
+    {
+      "method": "POST",
+      "path": "/users",
+      "description": "Skapa en ny användare (utan JWT)"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/:id",
+      "description": "Uppdatera en användare baserat på ID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/:id",
+      "description": "Radera en användare baserat på ID"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms",
+      "description": "Hämtar alla rum"
+    },
+    {
+      "method": "GET",
+      "path": "/rooms/:id",
+      "description": "Hämtar ett rum baserat på ID"
+    },
+    {
+      "method": "POST",
+      "path": "/rooms",
+      "description": "Skapar ett nytt rum"
+    },
+    {
+      "method": "PUT",
+      "path": "/rooms/:id",
+      "description": "Uppdaterar ett rum baserat på ID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/rooms/:id",
+      "description": "Tar bort ett rum baserat på ID"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings",
+      "description": "Hämtar alla bokningar med rum och användarinformation"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/:id",
+      "description": "Hämtar en bokning baserat på ID"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings",
+      "description": "Skapar en ny bokning"
+    },
+    {
+      "method": "PUT",
+      "path": "/bookings/:id",
+      "description": "Uppdaterar en bokning baserat på ID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/bookings/:id",
+      "description": "Tar bort en bokning baserat på ID"
+    },
+    {
+      "method": "POST",
+      "path": "/device-config/:serialNumber",
+      "description": "Registrerar en enhet baserat på serienummer"
+    },
+    {
+      "method": "PUT",
+      "path": "/device-config/:serialNumber",
+      "description": "Kopplar en enhet till ett rum"
+    },
+    {
+      "method": "GET",
+      "path": "/device-config/:serialNumber",
+      "description": "Hämtar konfiguration för en specifik enhet"
+    }
+  ]
+}
