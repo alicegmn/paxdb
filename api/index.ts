@@ -39,8 +39,6 @@ app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/bookings", bookingRoutes);
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 app.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
