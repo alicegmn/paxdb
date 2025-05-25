@@ -1,7 +1,104 @@
 {
   "title": "PAX API Documentation",
   "version": "1.0.0",
-  "description": "REST API för det automatiserade rumsbokningssystemet PAX",
+  "description": "REST API för det automatiserade rumsbokningssystemet PAX. Systemet används av medarbetare via en mobilapp och administratörer via en webbaserad dashboard.",
+  "usage": {
+    "frontend_mobile": "React Native-app för medarbetare – autentisera, hämta rum, boka rum, se sina bokningar.",
+    "frontend_web": "Webbaserad React-app – skapa och hantera användare, administrera rum och koppla sensorenheter (devices) till specifika rum."
+  },
+  "types": {
+    "User": {
+      "id": "number",
+      "name": "string",
+      "surname": "string",
+      "email": "string",
+      "password": "string",
+      "role": "'admin' | 'user' | 'moderator'"
+    },
+    "Room": {
+      "id": "number",
+      "name": "string",
+      "description": "string",
+      "available": "boolean",
+      "air_quality": "number",
+      "screen": "boolean",
+      "floor": "number",
+      "chairs": "number",
+      "whiteboard": "boolean",
+      "projector": "boolean",
+      "temperature": "number",
+      "activity": "boolean",
+      "time": "string",
+      "img": "string"
+    },
+    "Booking": {
+      "id": "number",
+      "room_id": "number",
+      "user_id": "number",
+      "start_time": "ISO 8601 string",
+      "end_time": "ISO 8601 string"
+    },
+    "Device": {
+      "id": "number",
+      "serial_number": "string",
+      "room_id": "number | null"
+    }
+  },
+  "examples": {
+    "user": {
+      "id": 1,
+      "name": "Alice",
+      "surname": "Eriksson",
+      "email": "alice@example.com",
+      "role": "user"
+    },
+    "room": {
+      "id": 5,
+      "name": "Ocean Room",
+      "description": "Stort mötesrum med havsutsikt",
+      "available": true,
+      "air_quality": 95,
+      "screen": true,
+      "floor": 2,
+      "chairs": 10,
+      "whiteboard": true,
+      "projector": false,
+      "temperature": 21,
+      "activity": false,
+      "time": "",
+      "img": "https://example.com/image.jpg"
+    },
+    "booking": {
+      "id": 12,
+      "room_id": 5,
+      "user_id": 1,
+      "start_time": "2025-06-01T10:00:00Z",
+      "end_time": "2025-06-01T11:00:00Z"
+    },
+    "device": {
+      "id": 2,
+      "serial_number": "sensor-abc123",
+      "room_id": 5
+    }
+  },
+  "auth": {
+    "jwt": true,
+    "login_endpoint": "/auth/login",
+    "register_endpoint": "/auth/register",
+    "example_login": {
+      "email": "admin@pax.com",
+      "password": "admin123"
+    },
+    "headers": {
+      "Authorization": "Bearer <token>"
+    }
+  },
+  "notes": [
+    "Alla POST-, PUT- och DELETE-endpoints kräver JWT-token med korrekt roll i Authorization-header.",
+    "Tider ska skickas i ISO 8601-format (t.ex. '2025-06-01T10:00:00Z').",
+    "Endast administratörer har tillgång till dashboard och endpoints för att hantera användare, rum och devices.",
+    "Sensorenheter (devices) identifieras med ett unikt serienummer."
+  ],
   "endpoints": [
     {
       "method": "GET",
@@ -68,11 +165,7 @@
       "path": "/users/:id",
       "description": "Radera en användare baserat på ID"
     },
-    {
-      "method": "GET",
-      "path": "/rooms",
-      "description": "Hämtar alla rum"
-    },
+    { "method": "GET", "path": "/rooms", "description": "Hämtar alla rum" },
     {
       "method": "GET",
       "path": "/rooms/:id",

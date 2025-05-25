@@ -16,13 +16,9 @@ import authRoutes from "./routes/authRoutes";
 import docsRoutes from "./routes/docs";
 
 dotenv.config();
-
 const app = express();
-
 const port = process.env.PORT || 13000;
-
 app.use(express.json());
-
 app.use(limiter); // allows limiter on all routes
 // allow requests from frontend (localhost:5173)
 app.use(
@@ -31,7 +27,6 @@ app.use(
     credentials: true,
   })
 );
-
 app.use("/", setupRoutes);
 app.use("/docs", docsRoutes);
 app.use("/auth", authRoutes);
@@ -42,7 +37,9 @@ app.use("/bookings", bookingRoutes);
 app.get(
   "/",
   asyncHandler(async (_req: Request, res: Response) => {
-    return res.send("Welcome to the PAX API and database go to https://!");
+    return res.send(
+      "Welcome to the PAX API - read the docs on https://paxdb.vercel.app/docs!"
+    );
   })
 );
 
