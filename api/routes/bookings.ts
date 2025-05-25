@@ -14,6 +14,45 @@ interface Booking {
 
 type CreateBookingInput = Omit<Booking, "id">;
 
+/**
+ * @swagger
+ * tags:
+ *   name: Bookings
+ *   description: Booking system endpoints
+ */
+
+/**
+ * @swagger
+ * /bookings:
+ *   get:
+ *     summary: Get all bookings with room name and user email
+ *     tags: [Bookings]
+ *     responses:
+ *       200:
+ *         description: A list of bookings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   start_time:
+ *                     type: string
+ *                     format: date-time
+ *                   end_time:
+ *                     type: string
+ *                     format: date-time
+ *                   room_name:
+ *                     type: string
+ *                   user_email:
+ *                     type: string
+ *       500:
+ *         description: Internal server error
+ */
+
 // GET all bookings with room name and user email
 router.get(
   "/",
@@ -32,6 +71,27 @@ router.get(
   })
 );
 
+/**
+ * @swagger
+ * /bookings/{id}:
+ *   get:
+ *     summary: Get a booking by ID
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Booking found
+ *       404:
+ *         description: Booking not found
+ *       500:
+ *         description: Internal server error
+ */
+
 // GET a single booking by ID
 router.get(
   "/:id",
@@ -46,6 +106,39 @@ router.get(
     res.status(200).json(result.rows[0]);
   })
 );
+
+/**
+ * @swagger
+ * /bookings:
+ *   post:
+ *     summary: Create a new booking
+ *     tags: [Bookings]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [room_id, user_id, start_time, end_time]
+ *             properties:
+ *               room_id:
+ *                 type: integer
+ *               user_id:
+ *                 type: integer
+ *               start_time:
+ *                 type: string
+ *                 format: date-time
+ *               end_time:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: Booking created successfully
+ *       400:
+ *         description: Invalid room_id or user_id
+ *       500:
+ *         description: Internal server error
+ */
 
 // POST a new booking with foreign key validation
 router.post(
@@ -76,6 +169,47 @@ router.post(
     res.status(201).json(result.rows[0]);
   })
 );
+
+/**
+ * @swagger
+ * /bookings/{id}:
+ *   put:
+ *     summary: Update a booking
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [room_id, user_id, start_time, end_time]
+ *             properties:
+ *               room_id:
+ *                 type: integer
+ *               user_id:
+ *                 type: integer
+ *               start_time:
+ *                 type: string
+ *                 format: date-time
+ *               end_time:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: Booking updated successfully
+ *       400:
+ *         description: Invalid room_id or user_id
+ *       404:
+ *         description: Booking not found
+ *       500:
+ *         description: Internal server error
+ */
 
 // PUT update booking
 router.put(
@@ -111,6 +245,27 @@ router.put(
     res.status(200).json(result.rows[0]);
   })
 );
+
+/**
+ * @swagger
+ * /bookings/{id}:
+ *   delete:
+ *     summary: Delete a booking
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Booking deleted successfully
+ *       404:
+ *         description: Booking not found
+ *       500:
+ *         description: Internal server error
+ */
 
 // DELETE a booking
 router.delete(

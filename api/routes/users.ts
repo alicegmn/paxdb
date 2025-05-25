@@ -21,7 +21,6 @@ type UserInput = Omit<User, "id"> & { password: string };
  * tags:
  *   name: Users
  *   description: User management endpoints
- */
 
 /**
  * @swagger
@@ -35,11 +34,11 @@ type UserInput = Omit<User, "id"> & { password: string };
  *         application/json:
  *           schema:
  *             type: object
- *             required: [firstname, lastname, email, password]
+ *             required: [name, surname, email, password]
  *             properties:
- *               firstname:
+ *               name:
  *                 type: string
- *               lastname:
+ *               surname:
  *                 type: string
  *               email:
  *                 type: string
@@ -53,6 +52,7 @@ type UserInput = Omit<User, "id"> & { password: string };
  *       500:
  *         description: Error creating user
  */
+
 router.post(
   "/",
   asyncHandler(async (req: Request<{}, {}, UserInput>, res: Response) => {
@@ -72,26 +72,6 @@ router.post(
     }
   })
 );
-
-// router.post('/api/users', async (req, res) => {
-//   const { name, surname, email, password, role } = req.body;
-
-//   // ✅ Hash the password
-//   const hashedPassword = await bcrypt.hash(password, 10);
-
-//   // ✅ Save to database with hashed password
-//   const newUser = await db.user.create({
-//     data: {
-//       name,
-//       surname,
-//       email,
-//       password: hashedPassword,
-//       role,
-//     },
-//   });
-
-//   res.status(201).json({ id: newUser.id });
-// });
 
 /**
  * @swagger
@@ -127,13 +107,6 @@ router.get(
   })
 );
 
-router.get(
-  "/welcome",
-  asyncHandler(async (_req: Request, res: Response) => {
-    return res.send(" Welcome to the user route.");
-  })
-);
-
 /**
  * @swagger
  * /users/{id}:
@@ -158,6 +131,7 @@ router.get(
  *       500:
  *         description: Error fetching user
  */
+
 router.get(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
@@ -207,6 +181,7 @@ router.get(
  *       500:
  *         description: Error updating user
  */
+
 router.put(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
@@ -263,6 +238,7 @@ router.put(
  *       500:
  *         description: Error deleting user
  */
+
 router.delete(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {

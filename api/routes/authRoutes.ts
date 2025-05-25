@@ -21,6 +21,53 @@ interface DbUser extends User {
 
 const allowedRoles = ["admin", "user", "moderator"];
 
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication endpoints
+ */
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - name
+ *               - surname
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               surname:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user, moderator]
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid role
+ *       409:
+ *         description: Email already registered
+ *       500:
+ *         description: Registration failed
+ */
+
 //Tillfällig route för att skapa den första adminanvändaren
 router.post(
   "/create-first-admin",
@@ -138,6 +185,46 @@ router.post(
 //   })
 // );
 
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - name
+ *               - surname
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               surname:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user, moderator]
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid role
+ *       409:
+ *         description: Email already registered
+ *       500:
+ *         description: Registration failed
+ */
+
 router.post(
   "/register",
   asyncHandler(async (req: Request, res: Response) => {
@@ -235,6 +322,35 @@ router.post(
 //     }
 //   })
 // );
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Authenticate user and return JWT
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid login credentials
+ *       500:
+ *         description: Login failed
+ */
 
 router.post(
   "/login",

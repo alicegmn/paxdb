@@ -1,14 +1,13 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import pool from "./db";
-import swaggerUi from "swagger-ui-express";
 import cors from "cors";
 import limiter from "./middlewares/rateLimiter";
 import errorHandler from "./middlewares/errorHandler";
 import bcrypt from "bcryptjs";
 import asyncHandler from "./middlewares/asyncHandler";
-import YAML from "yamljs";
-import path from "path";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger/swagger";
 
 dotenv.config();
 
@@ -27,14 +26,13 @@ app.use(
   })
 );
 
-const swaggerDocument = YAML.load(path.join(__dirname, "./swagger.yaml"));
-
 // routes
 import setupRoutes from "./routes/setup";
 import userRoutes from "./routes/users";
 import roomRoutes from "./routes/rooms";
 import bookingRoutes from "./routes/bookings";
 import authRoutes from "./routes/authRoutes";
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", setupRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);

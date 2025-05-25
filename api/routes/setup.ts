@@ -4,6 +4,30 @@ import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /setup:
+ *   get:
+ *     summary: Initialize database and create tables
+ *     description: Creates tables for users, rooms, bookings, and devices if they don't exist. Also seeds a default admin user.
+ *     tags: [Setup]
+ *     responses:
+ *       200:
+ *         description: Setup complete
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "✅ Setup complete: Tables created and default admin checked."
+ *       500:
+ *         description: Setup failed
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "❌ Setup failed. See server logs."
+ */
+
 router.get("/setup", async (_req: Request, res: Response) => {
   try {
     console.log("🔧 Running setup script...");
