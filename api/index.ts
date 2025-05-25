@@ -9,6 +9,16 @@ import asyncHandler from "./middlewares/asyncHandler";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger/swagger";
 
+// Använd Swagger CDN för JS och CSS (för att det ska funka i prod på Vercel)
+const swaggerOptions = {
+  customCssUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css",
+  customJs: [
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js",
+  ],
+};
+
 dotenv.config();
 
 const app = express();
