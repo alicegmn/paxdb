@@ -19,7 +19,7 @@ interface DbUser extends User {
   password: string;
 }
 
-const allowedRoles = ["admin", "user", "moderator"];
+const allowedRoles = ["admin", "user", "moderator", "devices"];
 
 /**
  * @swagger
@@ -56,7 +56,7 @@ const allowedRoles = ["admin", "user", "moderator"];
  *                 type: string
  *               role:
  *                 type: string
- *                 enum: [admin, user, moderator]
+ *                 enum: [admin, user, moderator, devices]
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -67,62 +67,6 @@ const allowedRoles = ["admin", "user", "moderator"];
  *       500:
  *         description: Registration failed
  */
-
-//Tillfällig route för att skapa den första adminanvändaren
-router.post(
-  "/create-first-admin",
-  asyncHandler(async (req: Request, res: Response) => {
-    const {
-      email,
-      password,
-      name,
-      surname,
-    }: {
-      email: string;
-      password: string;
-      name: string;
-      surname: string;
-    } = req.body;
-
-    try {
-      const existingUser = await pool.query(
-        "SELECT * FROM users WHERE email = $1",
-        [email]
-      );
-
-      if (existingUser.rows.length > 0) {
-        return res.status(409).json({ message: "Email is already registered" });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const result = await pool.query(
-        "INSERT INTO users (email, password, name, surname, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, surname, role",
-        [email, hashedPassword, name, surname, "admin"]
-      );
-
-      const newUser = result.rows[0];
-
-      const token = jwt.sign(
-        {
-          id: newUser.id,
-          email: newUser.email,
-          role: newUser.role,
-        },
-        process.env.JWT_SECRET as string,
-        { expiresIn: "1h" }
-      );
-
-      return res.status(201).json({
-        message: "First admin created!",
-        token,
-        user: newUser,
-      });
-    } catch (error) {
-      return res.status(500).json({ message: "Internal server error", error });
-    }
-  })
-);
 
 // // POST /register
 // router.post(
@@ -139,7 +83,7 @@ router.post(
 //     // Validate role
 //     if (role && !allowedRoles.includes(role)) {
 //       return res.status(400).json({
-//         message: "Invalid role. Allowed roles are: admin, user, moderator.",
+//         message: "Invalid role. Allowed roles are: admin, user, moderator and devices.",
 //       });
 //     }
 
@@ -213,7 +157,7 @@ router.post(
  *                 type: string
  *               role:
  *                 type: string
- *                 enum: [admin, user, moderator]
+ *                 enum: [admin, user, moderator, devices]
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -243,7 +187,8 @@ router.post(
     } = req.body;
     if (role && !allowedRoles.includes(role)) {
       return res.status(400).json({
-        message: "Invalid role. Allowed roles are: admin, user, moderator.",
+        message:
+          "Invalid role. Allowed roles are: admin, user, moderator and devices.",
       });
     }
     const existingUser = await pool.query(

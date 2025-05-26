@@ -1,6 +1,12 @@
 import express from "express";
 import { registerDevice, assignRoomToDevice, getDeviceConfig, patchDeviceRoomData, getUnassignedDevices } from "../controllers/deviceConfigController";
 import { checkDeviceExists, checkRoomAvailability } from "../middlewares/deviceHandler";
+import {
+  registerDevice,
+  assignRoomToDevice,
+  getDeviceConfig,
+} from "../controllers/deviceConfigController";
+import asyncHandler from "../middlewares/asyncHandler";
 import authenticateToken from "../middlewares/authMiddleware";
 
 const router = express.Router();
@@ -12,7 +18,7 @@ const router = express.Router();
  *   description: Manage device-room configuration
  * 
  */
-router.get("/devices/unassigned", getUnassignedDevices);
+router.get("/devices/unassigned", authenticateToken, asyncHandler(getUnassignedDevices));
 /**
  * @swagger
  * /config/{serialNumber}:
@@ -34,7 +40,7 @@ router.get("/devices/unassigned", getUnassignedDevices);
  *         description: Server error
  */
 
-router.post("/:serialNumber", authenticateToken, checkDeviceExists, registerDevice,);
+router.post("/:serialNumber", authenticateToken, checkDeviceExists, asyncHandler(registerDevice));
 
 /**
  * @swagger
@@ -67,7 +73,12 @@ router.post("/:serialNumber", authenticateToken, checkDeviceExists, registerDevi
  *         description: Server error
  */
 
-router.put("/:serialNumber", checkRoomAvailability, assignRoomToDevice);
+router.put(
+  "/:serialNumber",
+  authenticateToken,
+  checkRoomAvailability,
+  asyncHandler(assignRoomToDevice)
+);
 
 /**
  * @swagger
@@ -99,8 +110,8 @@ router.put("/:serialNumber", checkRoomAvailability, assignRoomToDevice);
  *         description: Server error
  */
 
-router.get("/:serialNumber", getDeviceConfig);
+router.get("/:serialNumber", authenticateToken, asyncHandler(getDeviceConfig));
 
-router.patch("/:serialNumber", patchDeviceRoomData);
+router.patch("/:serialNumber", authenticateToken, asyncHandler(patchDeviceRoomData));
 
 export default router;

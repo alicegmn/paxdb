@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import pool from "../db";
 import asyncHandler from "../middlewares/asyncHandler";
+import authenticateToken from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
@@ -56,6 +57,7 @@ type CreateBookingInput = Omit<Booking, "id">;
 // GET all bookings with room name and user email
 router.get(
   "/",
+  authenticateToken,
   asyncHandler(async (_req: Request, res: Response) => {
     const result = await pool.query(`
       SELECT 
@@ -95,6 +97,7 @@ router.get(
 // GET a single booking by ID
 router.get(
   "/:id",
+  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await pool.query("SELECT * FROM bookings WHERE id = $1", [
@@ -143,6 +146,7 @@ router.get(
 // POST a new booking with foreign key validation
 router.post(
   "/",
+  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { room_id, user_id, start_time, end_time }: CreateBookingInput =
       req.body;
@@ -169,12 +173,11 @@ router.post(
     res.status(201).json(result.rows[0]);
   })
 );
-
 /**
  * @swagger
  * /bookings/{id}:
- *   put:
- *     summary: Update a booking
+ *   patch:
+ *     summary: Update a booking (partial update)
  *     tags: [Bookings]
  *     parameters:
  *       - in: path
@@ -188,7 +191,6 @@ router.post(
  *         application/json:
  *           schema:
  *             type: object
- *             required: [room_id, user_id, start_time, end_time]
  *             properties:
  *               room_id:
  *                 type: integer
@@ -212,31 +214,59 @@ router.post(
  */
 
 // PUT update booking
-router.put(
+router.patch(
   "/:id",
+  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { room_id, user_id, start_time, end_time }: CreateBookingInput =
-      req.body;
+    const { room_id, user_id, start_time, end_time } = req.body;
 
-    const roomCheck = await pool.query("SELECT id FROM rooms WHERE id = $1", [
-      room_id,
-    ]);
-    if (roomCheck.rows.length === 0) {
-      return res.status(400).json({ error: "Invalid room_id" });
+    // Kontrollera om något alls skickats in
+    if (!room_id && !user_id && !start_time && !end_time) {
+      return res.status(400).json({ error: "No fields provided to update" });
     }
 
-    const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [
-      user_id,
-    ]);
-    if (userCheck.rows.length === 0) {
-      return res.status(400).json({ error: "Invalid user_id" });
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (room_id) {
+      const roomCheck = await pool.query("SELECT id FROM rooms WHERE id = $1", [
+        room_id,
+      ]);
+      if (roomCheck.rows.length === 0) {
+        return res.status(400).json({ error: "Invalid room_id" });
+      }
+      updates.push("room_id = $" + (values.length + 1));
+      values.push(room_id);
     }
 
-    const result = await pool.query(
-      "UPDATE bookings SET room_id = $1, user_id = $2, start_time = $3, end_time = $4 WHERE id = $5 RETURNING *",
-      [room_id, user_id, start_time, end_time, id]
-    );
+    if (user_id) {
+      const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [
+        user_id,
+      ]);
+      if (userCheck.rows.length === 0) {
+        return res.status(400).json({ error: "Invalid user_id" });
+      }
+      updates.push("user_id = $" + (values.length + 1));
+      values.push(user_id);
+    }
+
+    if (start_time) {
+      updates.push("start_time = $" + (values.length + 1));
+      values.push(start_time);
+    }
+
+    if (end_time) {
+      updates.push("end_time = $" + (values.length + 1));
+      values.push(end_time);
+    }
+
+    values.push(id); // För WHERE-id
+
+    const query = `UPDATE bookings SET ${updates.join(", ")} WHERE id = $${
+      values.length
+    } RETURNING *`;
+    const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Booking not found" });
@@ -270,6 +300,7 @@ router.put(
 // DELETE a booking
 router.delete(
   "/:id",
+  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await pool.query(
