@@ -15,6 +15,8 @@ type Room = {
   chairs: number;
   whiteboard: boolean;
   projector: boolean;
+  temperature: number;
+  activity: boolean;
 };
 
 const App: React.FC = () => {
@@ -22,7 +24,7 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
-  const API_BASE_URL = "http://localhost:13000";
+  const API_BASE_URL = "https://paxdb.vercel.app";
 
   // fetch rooms
   useEffect(() => {

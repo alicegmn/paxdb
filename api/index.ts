@@ -69,89 +69,89 @@ app.get("/test-db", async (_req, res) => {
   }
 });
 
-// app.get("/setup", async (_req: Request, res: Response) => {
-//   console.log("setup starting");
-//   try {
-//     // Vänta 5 sekunder för att säkerställa att DB är redo
-//     await new Promise((resolve) => setTimeout(resolve, 5000));
+app.get("/setup", async (_req: Request, res: Response) => {
+  console.log("setup starting");
+  try {
+    // Vänta 5 sekunder för att säkerställa att DB är redo
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
-//     // Skapa tabell för rooms
-//     await pool.query(`
-//   CREATE TABLE IF NOT EXISTS rooms (
-//     id SERIAL PRIMARY KEY,
-//     name VARCHAR(100) NOT NULL,
-//     description TEXT,
-//     available BOOLEAN DEFAULT TRUE,
-//     air_quality INT DEFAULT 0,
-//     screen BOOLEAN DEFAULT FALSE,
-//     floor INT DEFAULT 0,
-//     chairs INT DEFAULT 0,
-//     whiteboard BOOLEAN DEFAULT FALSE,
-//     projector BOOLEAN DEFAULT FALSE,
-//     temperature INT DEFAULT 0,
-//     activity BOOLEAN DEFAULT FALSE,
-//     time VARCHAR(20),
-//     img TEXT
-//   )
-// `);
+    // Skapa tabell för rooms
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS rooms (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    available BOOLEAN DEFAULT TRUE,
+    air_quality INT DEFAULT 0,
+    screen BOOLEAN DEFAULT FALSE,
+    floor INT DEFAULT 0,
+    chairs INT DEFAULT 0,
+    whiteboard BOOLEAN DEFAULT FALSE,
+    projector BOOLEAN DEFAULT FALSE,
+    temperature INT DEFAULT 0,
+    activity BOOLEAN DEFAULT FALSE,
+    time VARCHAR(20),
+    img TEXT
+  )
+`);
 
-//     // Skapa tabell för users
-//     await pool.query(`
-//       CREATE TABLE IF NOT EXISTS users (
-//         id SERIAL PRIMARY KEY,
-//         username VARCHAR(100) NOT NULL,
-//         password TEXT NOT NULL,
-//         role VARCHAR(50) DEFAULT 'user'
-//       )
-//     `);
+    // Skapa tabell för users
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(100) NOT NULL,
+        password TEXT NOT NULL,
+        role VARCHAR(50) DEFAULT 'user'
+      )
+    `);
 
-//     await pool.query(`
-//   CREATE TABLE IF NOT EXISTS device_configs (
-//     id SERIAL PRIMARY KEY,
-//     serial_number VARCHAR(255) UNIQUE NOT NULL,
-//     room_id INT REFERENCES rooms(id)
-//   )
-// `);
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS device_configs (
+    id SERIAL PRIMARY KEY,
+    serial_number VARCHAR(255) UNIQUE NOT NULL,
+    room_id INT REFERENCES rooms(id)
+  )
+`);
 
-//     // Skapa admin om den inte finns
-//     const adminUser = await pool.query(
-//       "SELECT * FROM users WHERE username = $1",
-//       ["admin123"]
-//     );
-//     if (adminUser.rows.length === 0) {
-//       const hashedPassword = await bcrypt.hash("pass123", 10);
-//       await pool.query(
-//         "INSERT INTO users (username, password, role) VALUES ($1, $2, $3)",
-//         ["admin123", hashedPassword, "admin"]
-//       );
-//       console.log("✅ Admin user 'admin123' created");
-//     }
+    // Skapa admin om den inte finns
+    const adminUser = await pool.query(
+      "SELECT * FROM users WHERE username = $1",
+      ["admin123"]
+    );
+    if (adminUser.rows.length === 0) {
+      const hashedPassword = await bcrypt.hash("pass123", 10);
+      await pool.query(
+        "INSERT INTO users (username, password, role) VALUES ($1, $2, $3)",
+        ["admin123", hashedPassword, "admin"]
+      );
+      console.log("✅ Admin user 'admin123' created");
+    }
 
-//     // Skapa vanlig user om den inte finns
-//     const normalUser = await pool.query(
-//       "SELECT * FROM users WHERE username = $1",
-//       ["user123"]
-//     );
-//     if (normalUser.rows.length === 0) {
-//       const hashedPassword = await bcrypt.hash("pass123", 10);
-//       await pool.query(
-//         "INSERT INTO users (username, password, role) VALUES ($1, $2, $3)",
-//         ["user123", hashedPassword, "user"]
-//       );
-//       console.log("✅ User 'user123' created");
-//     }
+    // Skapa vanlig user om den inte finns
+    const normalUser = await pool.query(
+      "SELECT * FROM users WHERE username = $1",
+      ["user123"]
+    );
+    if (normalUser.rows.length === 0) {
+      const hashedPassword = await bcrypt.hash("pass123", 10);
+      await pool.query(
+        "INSERT INTO users (username, password, role) VALUES ($1, $2, $3)",
+        ["user123", hashedPassword, "user"]
+      );
+      console.log("✅ User 'user123' created");
+    }
 
-//     console.log("Table setup completed.");
-//     res.status(200).send("Setup completed");
-//   } catch (err) {
-//     console.error("Error during setup:", err);
-//     res.status(500).send("Error setting up database");
-//   }
-// });
+    console.log("Table setup completed.");
+    res.status(200).send("Setup completed");
+  } catch (err) {
+    console.error("Error during setup:", err);
+    res.status(500).send("Error setting up database");
+  }
+});
 
-// app.listen(port, () => {
-//   console.log(`Server listening on port ${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
 
 //only in dev mode
 if (process.env.NODE_ENV !== "production") {
