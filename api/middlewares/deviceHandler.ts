@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import pool from "../db";
 
-export const checkDeviceExists = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const checkDeviceExists = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
     const { serialNumber } = req.params;
     try {
         const result = await pool.query("SELECT 1 FROM device_configs WHERE serial_number = $1", [serialNumber]);
