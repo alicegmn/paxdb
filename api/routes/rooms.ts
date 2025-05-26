@@ -227,61 +227,7 @@ router.post("/", asyncHandler(createRoom));
  */
 
 // PATCH update room
-router.patch(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    if (isNaN(id)) {
-      return res.status(400).json({ message: "Invalid room ID" });
-    }
-
-    const fields = req.body;
-    const allowedFields = [
-      "name",
-      "description",
-      "available",
-      "air_quality",
-      "screen",
-      "floor",
-      "chairs",
-      "whiteboard",
-      "projector",
-      "temperature",
-      "activity",
-      "time",
-      "img",
-    ];
-
-    const updates = [];
-    const values = [];
-    let paramIndex = 1;
-
-    for (const key of allowedFields) {
-      if (key in fields) {
-        updates.push(`${key} = $${paramIndex}`);
-        values.push(fields[key]);
-        paramIndex++;
-      }
-    }
-
-    if (updates.length === 0) {
-      return res.status(400).json({ message: "No valid fields provided" });
-    }
-
-    values.push(id);
-    const query = `UPDATE rooms SET ${updates.join(
-      ", "
-    )} WHERE id = $${paramIndex} RETURNING *`;
-
-    const result = await pool.query(query, values);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Room not found" });
-    }
-
-    res.status(200).json(result.rows[0]);
-  })
-);
+router.patch("/:id", asyncHandler(patchRoom));
 
 /**
  * @swagger
