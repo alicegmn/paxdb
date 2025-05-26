@@ -14,6 +14,8 @@ import roomRoutes from "./routes/rooms";
 import bookingRoutes from "./routes/bookings";
 import authRoutes from "./routes/authRoutes";
 import docsRoutes from "./routes/docs";
+import deviceConfigRoutes from "./routes/deviceConfig"
+
 
 dotenv.config();
 const app = express();
@@ -40,6 +42,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/bookings", bookingRoutes);
+app.use("/config", deviceConfigRoutes);
 
 app.get(
   "/",
@@ -74,19 +77,23 @@ app.get("/test-db", async (_req, res) => {
 
 //     // Skapa tabell för rooms
 //     await pool.query(`
-//       CREATE TABLE IF NOT EXISTS rooms (
-//         id SERIAL PRIMARY KEY,
-//         name VARCHAR(100) NOT NULL,
-//         description TEXT,
-//         available BOOLEAN DEFAULT TRUE,
-//         air_quality INT DEFAULT 0,
-//         screen BOOLEAN DEFAULT FALSE,
-//         floor INT DEFAULT 0,
-//         chairs INT DEFAULT 0,
-//         whiteboard BOOLEAN DEFAULT FALSE,
-//         projector BOOLEAN DEFAULT FALSE
-//       )
-//     `);
+//   CREATE TABLE IF NOT EXISTS rooms (
+//     id SERIAL PRIMARY KEY,
+//     name VARCHAR(100) NOT NULL,
+//     description TEXT,
+//     available BOOLEAN DEFAULT TRUE,
+//     air_quality INT DEFAULT 0,
+//     screen BOOLEAN DEFAULT FALSE,
+//     floor INT DEFAULT 0,
+//     chairs INT DEFAULT 0,
+//     whiteboard BOOLEAN DEFAULT FALSE,
+//     projector BOOLEAN DEFAULT FALSE,
+//     temperature INT DEFAULT 0,
+//     activity BOOLEAN DEFAULT FALSE,
+//     time VARCHAR(20),
+//     img TEXT
+//   )
+// `);
 
 //     // Skapa tabell för users
 //     await pool.query(`
@@ -97,6 +104,14 @@ app.get("/test-db", async (_req, res) => {
 //         role VARCHAR(50) DEFAULT 'user'
 //       )
 //     `);
+
+//     await pool.query(`
+//   CREATE TABLE IF NOT EXISTS device_configs (
+//     id SERIAL PRIMARY KEY,
+//     serial_number VARCHAR(255) UNIQUE NOT NULL,
+//     room_id INT REFERENCES rooms(id)
+//   )
+// `);
 
 //     // Skapa admin om den inte finns
 //     const adminUser = await pool.query(
