@@ -103,7 +103,7 @@ router.get("/setup", async (_req: Request, res: Response) => {
     console.log("✅ Tables created (if not already existing).");
     res
       .status(200)
-      .send("✅ Setup complete: Tables created and default admin checked.");
+      .send("✅ Setup complete:TEST 123 Tables created and default admin checked.");
   } catch (err) {
     console.error("❌ Setup error:", err);
     res.status(500).send("❌ Setup failed. See server logs.");
