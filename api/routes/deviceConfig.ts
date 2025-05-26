@@ -4,6 +4,7 @@ import {
   assignRoomToDevice,
   getDeviceConfig,
 } from "../controllers/deviceConfigController";
+import asyncHandler from "../middlewares/asyncHandler";
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ const router = express.Router();
  *         description: Server error
  */
 
-router.post("/:serialNumber", registerDevice);
+router.post("/:serialNumber", asyncHandler(registerDevice));
 
 /**
  * @swagger
@@ -68,7 +69,7 @@ router.post("/:serialNumber", registerDevice);
  *         description: Server error
  */
 
-router.put("/:serialNumber", assignRoomToDevice);
+router.put("/:serialNumber", asyncHandler(assignRoomToDevice));
 
 /**
  * @swagger
@@ -100,6 +101,6 @@ router.put("/:serialNumber", assignRoomToDevice);
  *         description: Server error
  */
 
-router.get("/:serialNumber", getDeviceConfig);
+router.get("/:serialNumber", asyncHandler(getDeviceConfig));
 
 export default router;
