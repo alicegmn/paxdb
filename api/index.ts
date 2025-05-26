@@ -20,13 +20,20 @@ const app = express();
 const port = process.env.PORT || 13000;
 app.use(express.json());
 app.use(limiter); // allows limiter on all routes
-// allow requests from frontend (localhost:5173)
+
+// allow requests from frontend and deployed app
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:8080",
+      "http://localhost:8081",
+      "https://paxdb.vercel.app",
+    ],
     credentials: true,
   })
 );
+
 app.use("/", setupRoutes);
 app.use("/docs", docsRoutes);
 app.use("/auth", authRoutes);
