@@ -105,16 +105,16 @@ router.get("/setup", async (_req: Request, res: Response) => {
           [user.name, user.surname, user.email, hashedPassword, user.role]
         );
         console.log(
-          `✅ ${user.role} user created (${user.email} / ${user.password})`
+          `${user.role} user created (${user.email} / ${user.password})`
         );
       }
     }
 
-    console.log("✅ Tables created and users seeded.");
-    res.status(200).send("✅ Setup complete: Tables created and users added.");
+    console.log("Tables created and users seeded.");
+    res.status(200).send("Setup complete: Tables created and users added.");
   } catch (err) {
-    console.error("❌ Setup error:", err);
-    res.status(500).send("❌ Setup failed. See server logs.");
+    console.error("Setup error:", err);
+    res.status(500).send("Setup failed. See server logs.");
   }
 });
 
