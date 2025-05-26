@@ -1,10 +1,11 @@
 import express from "express";
 import asyncHandler from "../middlewares/asyncHandler";
+import requireRole from "../middlewares/requireRole";
+import authenticateToken from "../middlewares/authMiddleware";
 import {
   getAllRooms,
   getRoomById,
   createRoom,
-  updateRoom,
   patchRoom,
   deleteRoom,
 } from "../controllers/roomController";
@@ -114,7 +115,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Room'
  */
-router.get("/", asyncHandler(getAllRooms));
+router.get("/", authenticateToken, asyncHandler(getAllRooms));
 
 /**
  * @swagger
@@ -140,7 +141,7 @@ router.get("/", asyncHandler(getAllRooms));
  *       404:
  *         description: Room not found
  */
-router.get("/:id", asyncHandler(getRoomById));
+router.get("/:id", authenticateToken, asyncHandler(getRoomById));
 
 /**
  * @swagger
@@ -162,7 +163,12 @@ router.get("/:id", asyncHandler(getRoomById));
  *             schema:
  *               $ref: '#/components/schemas/Room'
  */
-router.post("/", asyncHandler(createRoom));
+router.post(
+  "/",
+  authenticateToken,
+  requireRole(["admin", "moderator"]),
+  asyncHandler(createRoom)
+);
 
 /**
  * @swagger
@@ -225,7 +231,7 @@ router.post("/", asyncHandler(createRoom));
  *       404:
  *         description: Room not found
  */
-router.patch("/:id", asyncHandler(patchRoom));
+router.patch("/:id", authenticateToken, asyncHandler(patchRoom));
 
 /**
  * @swagger
@@ -256,6 +262,6 @@ router.patch("/:id", asyncHandler(patchRoom));
  *       404:
  *         description: Room not found
  */
-router.delete("/:id", asyncHandler(deleteRoom));
+router.delete("/:id", authenticateToken, asyncHandler(deleteRoom));
 
 export default router;

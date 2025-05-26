@@ -1,16 +1,19 @@
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "./authMiddleware.ts";
+import { AuthenticatedRequest } from "./authMiddleware";
 
-const requireRole = (role: string) => {
+const requireRole = (roles: string[]) => {
   return (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
   ): void => {
-    if (!req.user || req.user.role !== role) {
+    const userRole = req.user?.role;
+
+    if (!userRole || !roles.includes(userRole)) {
       res.status(403).json({ message: "Access denied: insufficient role" });
       return;
     }
+
     next();
   };
 };

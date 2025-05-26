@@ -8,7 +8,7 @@ import {
 } from "../controllers/userController";
 import asyncHandler from "../middlewares/asyncHandler";
 import requireRole from "../middlewares/requireRole";
-import authenticateToken from "../middlewares/authMiddleware.ts";
+import authenticateToken from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
@@ -49,7 +49,12 @@ const router = express.Router();
  *       500:
  *         description: Error creating user
  */
-router.post("/", asyncHandler(createUser));
+router.post(
+  "/",
+  authenticateToken,
+  requireRole(["admin", "moderator"]),
+  asyncHandler(createUser)
+);
 
 /**
  * @swagger
@@ -69,7 +74,12 @@ router.post("/", asyncHandler(createUser));
  *       500:
  *         description: Error fetching users
  */
-router.get("/:serialNumber", authenticateToken, requireRole("admin"), asyncHandler(getAllUsers));
+router.get(
+  "/:id",
+  authenticateToken,
+  requireRole(["admin", "moderator"]),
+  asyncHandler(getAllUsers)
+);
 
 /**
  * @swagger
@@ -95,7 +105,7 @@ router.get("/:serialNumber", authenticateToken, requireRole("admin"), asyncHandl
  *       500:
  *         description: Error fetching user
  */
-router.get("/:id", asyncHandler(getUserById));
+router.get("/:id", authenticateToken, asyncHandler(getUserById));
 
 /**
  * @swagger
@@ -141,7 +151,12 @@ router.get("/:id", asyncHandler(getUserById));
  *       500:
  *         description: Error updating user
  */
-router.patch("/:id", asyncHandler(patchUser));
+router.patch(
+  "/:id",
+  authenticateToken,
+  requireRole(["admin", "moderator"]),
+  asyncHandler(patchUser)
+);
 
 /**
  * @swagger
@@ -172,6 +187,11 @@ router.patch("/:id", asyncHandler(patchUser));
  *       500:
  *         description: Error deleting user
  */
-router.delete("/:id", asyncHandler(deleteUser));
+router.delete(
+  "/:id",
+  authenticateToken,
+  requireRole(["admin", "moderator"]),
+  asyncHandler(deleteUser)
+);
 
 export default router;
