@@ -53,7 +53,7 @@ router.get("/setup", async (_req: Request, res: Response) => {
 
     // Devices table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS devices (
+      CREATE TABLE IF NOT EXISTS device_configs (
         id SERIAL PRIMARY KEY,
         serial_number VARCHAR(100) UNIQUE NOT NULL,
         room_id INTEGER REFERENCES rooms(id) ON DELETE SET NULL
