@@ -169,8 +169,8 @@ router.post(
 /**
  * @swagger
  * /rooms/{id}:
- *   put:
- *     summary: Update a room
+ *   patch:
+ *     summary: Partially update a room by ID
  *     tags: [Rooms]
  *     parameters:
  *       - in: path
@@ -178,12 +178,43 @@ router.post(
  *         required: true
  *         schema:
  *           type: integer
+ *         description: The ID of the room to update
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateRoomInput'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               available:
+ *                 type: boolean
+ *               air_quality:
+ *                 type: number
+ *               screen:
+ *                 type: boolean
+ *               floor:
+ *                 type: integer
+ *               chairs:
+ *                 type: integer
+ *               whiteboard:
+ *                 type: boolean
+ *               projector:
+ *                 type: boolean
+ *               temperature:
+ *                 type: number
+ *               activity:
+ *                 type: boolean
+ *               time:
+ *                 type: string
+ *               img:
+ *                 type: string
+ *           example:
+ *             floor: 3
+ *             available: false
  *     responses:
  *       200:
  *         description: Room updated successfully
@@ -192,13 +223,13 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/Room'
  *       400:
- *         description: Invalid room ID
+ *         description: Invalid room ID or no valid fields provided
  *       404:
  *         description: Room not found
  */
 
-// PUT update room
-router.put(
+// PATCH update room
+router.patch(
   "/:id",
   asyncHandler(async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -206,56 +237,45 @@ router.put(
       return res.status(400).json({ message: "Invalid room ID" });
     }
 
-    const {
-      name,
-      description,
-      available,
-      air_quality,
-      screen,
-      floor,
-      chairs,
-      whiteboard,
-      projector,
-      temperature,
-      activity,
-      time,
-      img,
-    } = req.body as CreateRoomInput;
+    const fields = req.body;
+    const allowedFields = [
+      "name",
+      "description",
+      "available",
+      "air_quality",
+      "screen",
+      "floor",
+      "chairs",
+      "whiteboard",
+      "projector",
+      "temperature",
+      "activity",
+      "time",
+      "img",
+    ];
 
-    const result = await pool.query(
-      `UPDATE rooms SET 
-        name = $1,
-        description = $2,
-        available = $3,
-        air_quality = $4,
-        screen = $5,
-        floor = $6,
-        chairs = $7,
-        whiteboard = $8,
-        projector = $9,
-        temperature = $10,
-        activity = $11,
-        time = $12,
-        img = $13
-        WHERE id = $14
-        RETURNING *`,
-      [
-        name,
-        description,
-        available,
-        air_quality,
-        screen,
-        floor,
-        chairs,
-        whiteboard,
-        projector,
-        temperature,
-        activity,
-        time,
-        img,
-        id,
-      ]
-    );
+    const updates = [];
+    const values = [];
+    let paramIndex = 1;
+
+    for (const key of allowedFields) {
+      if (key in fields) {
+        updates.push(`${key} = $${paramIndex}`);
+        values.push(fields[key]);
+        paramIndex++;
+      }
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: "No valid fields provided" });
+    }
+
+    values.push(id);
+    const query = `UPDATE rooms SET ${updates.join(
+      ", "
+    )} WHERE id = $${paramIndex} RETURNING *`;
+
+    const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Room not found" });

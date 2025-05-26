@@ -77,7 +77,7 @@
     },
     "device": {
       "id": 2,
-      "serial_number": "sensor-abc123",
+      "serial_number": "00000000-0000-0000-0000-000000000000",
       "room_id": 5
     }
   },
@@ -151,11 +151,6 @@
       "description": "Hämtar en användare baserat på ID"
     },
     {
-      "method": "POST",
-      "path": "/users",
-      "description": "Skapa en ny användare (utan JWT)"
-    },
-    {
       "method": "PUT",
       "path": "/users/:id",
       "description": "Uppdatera en användare baserat på ID"
@@ -177,9 +172,9 @@
       "description": "Skapar ett nytt rum"
     },
     {
-      "method": "PUT",
+      "method": "PATCH",
       "path": "/rooms/:id",
-      "description": "Uppdaterar ett rum baserat på ID"
+      "description": "Uppdaterar valda fält för ett specifikt rum baserat på ID (partiell uppdatering)"
     },
     {
       "method": "DELETE",
