@@ -10,9 +10,8 @@ const Dashboard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
-  const API_BASE_URL = "http://localhost:13000";
+  const API_BASE_URL = "https://paxdb.vercel.app/";
 
-  // // Mock room data
   // const [rooms, setRooms] = useState<Room[]>([
   //   {
   //     id: 1,
@@ -94,7 +93,9 @@ const Dashboard: React.FC = () => {
       });
       if (!res.ok) throw new Error("Failed to update room");
       const updatedRoom = await res.json();
-      setRooms((prev) => prev.map((r) => (r.id === updatedRoom.id ? updatedRoom : r)));
+      setRooms((prev) =>
+        prev.map((r) => (r.id === updatedRoom.id ? updatedRoom : r))
+      );
     } catch (error) {
       console.error("Error updating room:", error);
     } finally {
@@ -105,16 +106,18 @@ const Dashboard: React.FC = () => {
 
   // Delete a room
   const handleDeleteRoom = async (id: number) => {
-    if (!window.confirm("Är du säker på att du vill ta bort detta rum?")) return;
+    if (!window.confirm("Är du säker på att du vill ta bort detta rum?"))
+      return;
     try {
-      const res = await fetch(`${API_BASE_URL}/rooms/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE_URL}/rooms/${id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error("Failed to delete room");
       setRooms((prev) => prev.filter((room) => room.id !== id));
     } catch (error) {
       console.error("Error deleting room:", error);
     }
   };
-
 
   return (
     <main className="flex flex-col flex-grow bg-gray-300 min-h-screen p-6">

@@ -12,7 +12,7 @@ const Auth: React.FC = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:13000/auth/login", {
+      const res = await fetch("https://paxdb.vercel.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -43,7 +43,6 @@ const Auth: React.FC = () => {
     }
   };
 
-
   return (
     <main className="flex items-center justify-center min-h-screen bg-[#10302B] p-6">
       <div className="bg-white/10 rounded-lg p-8 w-full max-w-md backdrop-blur-sm">
@@ -54,7 +53,10 @@ const Auth: React.FC = () => {
         <h1 className="text-2xl font-bold text-white">Logga in</h1>
         <form className="mt-4" onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-white">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-white"
+            >
               Användarnamn
             </label>
             <input
@@ -68,7 +70,10 @@ const Auth: React.FC = () => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="password" className="block text-sm font-medium text-white">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-white"
+            >
               Lösenord
             </label>
             <input
