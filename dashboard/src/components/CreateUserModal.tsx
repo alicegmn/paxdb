@@ -1,5 +1,8 @@
 import React, { FC, useState, useEffect } from "react";
 import Button from "./Button";
+// import Auth from "@/pages/Auth";
+
+// const [password, setPassword] = useState("");
 
 // User type with role as string
 type User = {
@@ -51,18 +54,40 @@ const CreateUserModal: FC<CreateUserModalProps> = ({ isOpen, onClose, onCreate, 
         }));
     };
 
-    const handleSubmit = () => {
-        const user: User = {
-            id: userToEdit?.id ?? Date.now(),
-            ...form,
-        };
+    const handleSubmit = async () => {
         if (userToEdit && onEdit) {
+            const user: User = {
+                id: userToEdit.id,
+                ...form,
+            };
             onEdit(user);
-        } else if (onCreate) {
-            onCreate(user);
+            onClose();
+            return;
         }
-        onClose();
+
+        try {
+            const res = await fetch("http://localhost:13000/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(form),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to create user");
+            }
+
+            const data = await res.json();
+            console.log("User created:", data.user);
+            onClose();
+        } catch (error) {
+            console.error("Error creating user:", error);
+        }
     };
+
+
 
     if (!isOpen) return null;
 
