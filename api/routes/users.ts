@@ -7,6 +7,8 @@ import {
   deleteUser,
 } from "../controllers/userController";
 import asyncHandler from "../middlewares/asyncHandler";
+import requireRole from "../middlewares/requireRole";
+import authenticateToken from "../middlewares/authMiddleware.ts";
 
 const router = express.Router();
 
@@ -67,7 +69,7 @@ router.post("/", asyncHandler(createUser));
  *       500:
  *         description: Error fetching users
  */
-router.get("/", asyncHandler(getAllUsers));
+router.get("/", authenticateToken, requireRole("admin"), asyncHandler(getAllUsers));
 
 /**
  * @swagger
