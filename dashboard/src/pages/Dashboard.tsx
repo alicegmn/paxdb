@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
-  const API_BASE_URL = "http://localhost:13000";
+  const API_BASE_URL = "https://paxdb.vercel.app";
 
   // // Mock room data
   // const [rooms, setRooms] = useState<Room[]>([
@@ -55,8 +55,22 @@ const Dashboard: React.FC = () => {
   // Fetch rooms from API
   useEffect(() => {
     const fetchRooms = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Ingen token hittades i localStorage");
+        return;
+      }
+
       try {
-        const res = await fetch(`${API_BASE_URL}/rooms`);
+        const res = await fetch(`${API_BASE_URL}/rooms`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error(`Fetch failed with status ${res.status}`);
         const data = await res.json();
         console.log("Fetched rooms:", data);
         setRooms(data);
@@ -64,6 +78,7 @@ const Dashboard: React.FC = () => {
         console.error("Error fetching rooms:", error);
       }
     };
+
     fetchRooms();
   }, []);
 
