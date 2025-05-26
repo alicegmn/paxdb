@@ -69,7 +69,7 @@ router.post("/", asyncHandler(createUser));
  *       500:
  *         description: Error fetching users
  */
-router.get("/", authenticateToken, requireRole("admin"), asyncHandler(getAllUsers));
+router.get("/:serialNumber", authenticateToken, requireRole("admin"), asyncHandler(getAllUsers));
 
 /**
  * @swagger
