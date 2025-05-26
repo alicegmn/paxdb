@@ -1,26 +1,21 @@
-import express, { Request, Response, Router } from "express";
-import pool from "../db";
+import express from "express";
+import {
+  createUser,
+  getAllUsers,
+  getUserById,
+  patchUser,
+  deleteUser,
+} from "../controllers/userController";
 import asyncHandler from "../middlewares/asyncHandler";
-// import bcrypt from "bcrypt";
 
-const router: Router = express.Router();
-
-interface User {
-  id: number;
-  name: string;
-  surname: string;
-  email: string;
-  password: string;
-  role: string;
-}
-
-type UserInput = Omit<User, "id"> & { password: string };
+const router = express.Router();
 
 /**
  * @swagger
  * tags:
  *   name: Users
  *   description: User management endpoints
+ */
 
 /**
  * @swagger
@@ -52,26 +47,7 @@ type UserInput = Omit<User, "id"> & { password: string };
  *       500:
  *         description: Error creating user
  */
-
-router.post(
-  "/",
-  asyncHandler(async (req: Request<{}, {}, UserInput>, res: Response) => {
-    const { name, surname, email, password, role } = req.body;
-
-    try {
-      const result = await pool.query(
-        `INSERT INTO users (name, surname, email, password, role)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, surname, email, password, role`,
-        [name, surname, email, password, role || "user"]
-      );
-      res.status(201).json(result.rows[0]);
-    } catch (err) {
-      console.error("Error creating user:", err);
-      res.status(500).json({ error: "Error creating user" });
-    }
-  })
-);
+router.post("/", asyncHandler(createUser));
 
 /**
  * @swagger
@@ -91,21 +67,7 @@ router.post(
  *       500:
  *         description: Error fetching users
  */
-
-router.get(
-  "/",
-  asyncHandler(async (_req: Request, res: Response) => {
-    try {
-      const result = await pool.query(
-        "SELECT id, name, surname, email, role FROM users"
-      );
-      res.json(result.rows);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      res.status(500).json({ error: "Error fetching users" });
-    }
-  })
-);
+router.get("/", asyncHandler(getAllUsers));
 
 /**
  * @swagger
@@ -131,35 +93,13 @@ router.get(
  *       500:
  *         description: Error fetching user
  */
-
-router.get(
-  "/:id",
-  asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-      const result = await pool.query(
-        "SELECT id, name, surname, email, role FROM users WHERE id = $1",
-        [id]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      res.json(result.rows[0]);
-    } catch (err) {
-      console.error("Error fetching user:", err);
-      res.status(500).json({ error: "Error fetching user" });
-    }
-  })
-);
+router.get("/:id", asyncHandler(getUserById));
 
 /**
  * @swagger
  * /users/{id}:
- *   put:
- *     summary: Update a user
+ *   patch:
+ *     summary: Partially update a user
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -172,42 +112,34 @@ router.get(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               surname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *           example:
+ *             email: "newmail@example.com"
+ *             role: "moderator"
  *     responses:
  *       200:
  *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: No valid fields provided or invalid ID
  *       404:
  *         description: User not found
  *       500:
  *         description: Error updating user
  */
-
-router.put(
-  "/:id",
-  asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { name, surname, email, role } = req.body;
-
-    try {
-      const result = await pool.query(
-        `UPDATE users 
-       SET name = $1, surname = $2, email = $3, role = $4
-       WHERE id = $5 
-       RETURNING id, name, surname, email, role`,
-        [name, surname, email, role, id]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      res.json(result.rows[0]);
-    } catch (err) {
-      console.error("Error updating user:", err);
-      res.status(500).json({ error: "Error updating user" });
-    }
-  })
-);
+router.patch("/:id", asyncHandler(patchUser));
 
 /**
  * @swagger
@@ -238,28 +170,6 @@ router.put(
  *       500:
  *         description: Error deleting user
  */
-
-router.delete(
-  "/:id",
-  asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-      const result = await pool.query(
-        "DELETE FROM users WHERE id = $1 RETURNING id, name, surname, email, password, role",
-        [id]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      res.json({ message: "User deleted", user: result.rows[0] });
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      res.status(500).json({ error: "Error deleting user" });
-    }
-  })
-);
+router.delete("/:id", asyncHandler(deleteUser));
 
 export default router;

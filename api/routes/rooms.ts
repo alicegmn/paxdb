@@ -225,8 +225,6 @@ router.post("/", asyncHandler(createRoom));
  *       404:
  *         description: Room not found
  */
-
-// PATCH update room
 router.patch("/:id", asyncHandler(patchRoom));
 
 /**
