@@ -231,7 +231,7 @@ router.post(
  *       404:
  *         description: Room not found
  */
-router.patch("/:id", authenticateToken, asyncHandler(patchRoom));
+router.patch("/:id", asyncHandler(patchRoom));
 
 /**
  * @swagger
