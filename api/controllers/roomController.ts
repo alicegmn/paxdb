@@ -71,11 +71,9 @@ export const patchRoom = async (req: Request, res: Response) => {
   const setClause = fields.map((f, i) => `${f} = $${i + 1}`).join(", ");
 
   const result = await pool.query(
-    `UPDATE rooms SET ${setClause} WHERE id = $${fields.length + 1
-    } RETURNING *`,
+    `UPDATE rooms SET ${setClause} WHERE id = $${fields.length + 1} RETURNING *`,
     [...values, id]
   );
-
   if (result.rows.length === 0)
     return res.status(404).json({ message: "Room not found" });
 

@@ -8,7 +8,6 @@ import {
 } from "../controllers/deviceConfigController";
 import {
   checkDeviceExists,
-  checkRoomAvailability,
 } from "../middlewares/deviceHandler";
 import asyncHandler from "../middlewares/asyncHandler";
 import authenticateToken from "../middlewares/authMiddleware";

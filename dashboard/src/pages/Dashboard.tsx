@@ -109,17 +109,52 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Update an existing room
-  const handleUpdateRoom = async (room: Room) => {
+  function getChangedFields<T>(original: T, updated: Partial<T>): Partial<T> {
+    const changed: Partial<T> = {};
+    for (const key in updated) {
+      if (updated[key] !== original[key]) {
+        changed[key] = updated[key];
+      }
+    }
+    return changed;
+  }
+
+  const handleUpdateRoom = async (updatedRoomData: Partial<Room>) => {
+    if (!editingRoom) {
+      console.warn("Inget rum valt för redigering");
+      return;
+    }
+
+    const changedFields = getChangedFields(editingRoom, updatedRoomData);
+
+    if (Object.keys(changedFields).length === 0) {
+      setIsModalOpen(false);
+      setEditingRoom(null);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/rooms/${room.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(room),
+      const res = await fetch(`${API_BASE_URL}/rooms/${editingRoom.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(changedFields),
       });
+
       if (!res.ok) throw new Error("Failed to update room");
+
       const updatedRoom = await res.json();
-      setRooms((prev) => prev.map((r) => (r.id === updatedRoom.id ? updatedRoom : r)));
+      setRooms((prev) =>
+        prev.map((r) => (r.id === updatedRoom.id ? updatedRoom : r))
+      );
     } catch (error) {
       console.error("Error updating room:", error);
     } finally {
@@ -127,6 +162,7 @@ const Dashboard: React.FC = () => {
       setIsModalOpen(false);
     }
   };
+
 
   // Delete a room
   const handleDeleteRoom = async (id: number) => {
