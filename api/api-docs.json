@@ -38,7 +38,7 @@
       "start_time": "ISO 8601 string",
       "end_time": "ISO 8601 string"
     },
-    "Device": {
+    "DeviceConfig": {
       "id": "number",
       "serial_number": "string",
       "room_id": "number | null"
@@ -217,9 +217,19 @@
       "description": "Kopplar en enhet till ett rum"
     },
     {
+      "method": "PATCH",
+      "path": "/device-config/:serialNumber",
+      "description": "Uppdaterar data för ett rum kopplat till en device, t.ex. air_quality, temperature, activity"
+    },
+    {
       "method": "GET",
       "path": "/device-config/:serialNumber",
       "description": "Hämtar konfiguration för en specifik enhet"
+    },
+    {
+      "method": "GET",
+      "path": "/device-config/devices/unassigned",
+      "description": "Returnerar alla registrerade enheter som inte är kopplade till något rum"
     }
   ]
 }

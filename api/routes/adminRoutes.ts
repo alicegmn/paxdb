@@ -41,7 +41,7 @@ const router = express.Router();
 router.get(
   "/dashboard",
   authenticateToken,
-  requireRole(["admin", "moderator"]),
+  requireRole(["admin", "moderator", "devices"]),
   (req: AuthenticatedRequest, res) => {
     res.json({ message: "Welcome to the admin dashboard", user: req.user });
   }
