@@ -1,4 +1,4 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import {
   registerDevice,
   assignRoomToDevice,
@@ -50,7 +50,7 @@ router.get(
 router.post(
   "/:serialNumber",
   authenticateToken,
-  checkDeviceExists,
+  checkDeviceExists as RequestHandler,
   asyncHandler(registerDevice)
 );
 
@@ -88,7 +88,6 @@ router.post(
 router.put(
   "/:serialNumber",
   authenticateToken,
-  checkRoomAvailability,
   asyncHandler(assignRoomToDevice)
 );
 
