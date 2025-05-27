@@ -1,13 +1,25 @@
 import { Request, Response } from "express";
 import pool from "../db";
+import { format, toZonedTime } from "date-fns-tz";
+
+const swedishTimeZone = "Europe/Stockholm";
 
 export const getAllRooms = async (_req: Request, res: Response) => {
   const result = await pool.query("SELECT * FROM rooms");
+  const nowUtc = new Date();
+
   res.status(200).json(
-    result.rows.map(room => ({
-      ...room,
-      time: new Date().toISOString(),
-    }))
+    result.rows.map(room => {
+      const localTime = format(
+        toZonedTime(nowUtc, swedishTimeZone),
+        "yyyy-MM-dd'T'HH:mm:ssXXX",
+        { timeZone: swedishTimeZone }
+      );
+      return {
+        ...room,
+        time: localTime,
+      };
+    })
   );
 };
 
@@ -20,9 +32,16 @@ export const getRoomById = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Room not found" });
 
   const room = result.rows[0];
+  const nowUtc = new Date();
+  const localTime = format(
+    toZonedTime(nowUtc, swedishTimeZone),
+    "yyyy-MM-dd'T'HH:mm:ssXXX",
+    { timeZone: swedishTimeZone }
+  );
+
   res.status(200).json({
     ...room,
-    time: new Date().toISOString(),
+    time: localTime,
   });
 };
 
