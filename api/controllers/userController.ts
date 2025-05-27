@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import pool from "../db";
+import bcrypt from "bcryptjs";
 
 export const createUser = async (req: Request, res: Response) => {
   const { name, surname, email, password, role } = req.body;
@@ -52,16 +53,24 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const patchUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const fields = ["name", "surname", "email", "role"];
+
+  // Tillåtna fält att uppdatera
+  const allowedFields = ["name", "surname", "email", "role", "password"];
   const updates: string[] = [];
   const values: any[] = [];
 
-  fields.forEach((field, index) => {
+  for (const field of allowedFields) {
     if (req.body[field] !== undefined) {
-      updates.push(`${field} = $${values.length + 1}`);
-      values.push(req.body[field]);
+      if (field === "password") {
+        const hashed = await bcrypt.hash(req.body.password, 10);
+        updates.push(`password = $${values.length + 1}`);
+        values.push(hashed);
+      } else {
+        updates.push(`${field} = $${values.length + 1}`);
+        values.push(req.body[field]);
+      }
     }
-  });
+  }
 
   if (updates.length === 0) {
     return res
