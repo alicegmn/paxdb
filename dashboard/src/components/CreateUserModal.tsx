@@ -64,12 +64,19 @@ const CreateUserModal: FC<CreateUserModalProps> = ({ isOpen, onClose, onCreate, 
             onClose();
             return;
         }
+    const token = localStorage.getItem("token");
+        
+    if (!token) {
+        console.warn("Ingen token hittades i localStorage");
+        return;
+        }
 
         try {
-            const res = await fetch("http://localhost:13000/auth/register", {
+            const res = await fetch("https://paxdb.vercel.app/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(form),
             });
