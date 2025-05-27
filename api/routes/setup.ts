@@ -8,17 +8,23 @@ router.get("/setup", async (_req: Request, res: Response) => {
   try {
     console.log("🔧 Running setup script...");
 
+    await pool.query(`
+      ALTER TABLE users
+      DROP CONSTRAINT IF EXISTS users_role_check,
+      ADD CONSTRAINT users_role_check CHECK (role IN ('admin', 'user', 'moderator', 'devices'));
+      `);
+
     // Users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        surname VARCHAR(100) NOT NULL,
-        email VARCHAR(150) UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'user', 'moderator', 'devices'))
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      surname VARCHAR(100) NOT NULL,
+      email VARCHAR(150) UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'user', 'moderator', 'devices'))
       );
-    `);
+      `);
 
     // Rooms table
     await pool.query(`
@@ -53,7 +59,7 @@ router.get("/setup", async (_req: Request, res: Response) => {
 
     // Devices table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS device_configs (
+      CREATE TABLE IF NOT EXISTS devices (
         id SERIAL PRIMARY KEY,
         serial_number VARCHAR(100) UNIQUE NOT NULL,
         room_id INTEGER REFERENCES rooms(id) ON DELETE SET NULL
