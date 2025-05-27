@@ -13,6 +13,7 @@ PAX är ett automatiserat rumsbokningssystem som förenklar vardagen på kontore
 ## Backend
 Our backend is now hosted on PaxDB:
 Base URL: https://paxdb.vercel.app
+API documentation URL: https://paxdb.vercel.app
 
 
 ## Frontend
