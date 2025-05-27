@@ -1,22 +1,34 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import {
   registerDevice,
   assignRoomToDevice,
   getDeviceConfig,
+  patchDeviceRoomData,
+  getUnassignedDevices,
 } from "../controllers/deviceConfigController";
+import {
+  checkDeviceExists,
+} from "../middlewares/deviceHandler";
+import asyncHandler from "../middlewares/asyncHandler";
+import authenticateToken from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
 /**
  * @swagger
  * tags:
- *   name: DeviceConfig
+ *   name: Config
  *   description: Manage device-room configuration
+ *
  */
-
+router.get(
+  "/devices/unassigned",
+  authenticateToken,
+  asyncHandler(getUnassignedDevices)
+);
 /**
  * @swagger
- * /device-config/{serialNumber}:
+ * /config/{serialNumber}:
  *   post:
  *     summary: Register a device
  *     tags: [DeviceConfig]
@@ -35,11 +47,16 @@ const router = express.Router();
  *         description: Server error
  */
 
-router.post("/:serialNumber", registerDevice);
+router.post(
+  "/:serialNumber",
+  authenticateToken,
+  checkDeviceExists as RequestHandler,
+  asyncHandler(registerDevice)
+);
 
 /**
  * @swagger
- * /device-config/{serialNumber}:
+ * /config/{serialNumber}:
  *   put:
  *     summary: Assign a room to a device
  *     tags: [DeviceConfig]
@@ -68,14 +85,18 @@ router.post("/:serialNumber", registerDevice);
  *         description: Server error
  */
 
-router.put("/:serialNumber", assignRoomToDevice);
+router.put(
+  "/:serialNumber",
+  authenticateToken,
+  asyncHandler(assignRoomToDevice)
+);
 
 /**
  * @swagger
- * /device-config/{serialNumber}:
+ * /config/{serialNumber}:
  *   get:
  *     summary: Get configuration for a device
- *     tags: [DeviceConfig]
+ *     tags: [Config]
  *     parameters:
  *       - in: path
  *         name: serialNumber
@@ -100,6 +121,12 @@ router.put("/:serialNumber", assignRoomToDevice);
  *         description: Server error
  */
 
-router.get("/:serialNumber", getDeviceConfig);
+router.get("/:serialNumber", authenticateToken, asyncHandler(getDeviceConfig));
+
+router.patch(
+  "/:serialNumber",
+  authenticateToken,
+  asyncHandler(patchDeviceRoomData)
+);
 
 export default router;

@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
 
-  const API_BASE_URL = "http://localhost:13000";
+  const API_BASE_URL = "https://paxdb.vercel.app";
 
   // // Mock room data
   // const [rooms, setRooms] = useState<Room[]>([
@@ -55,8 +55,22 @@ const Dashboard: React.FC = () => {
   // Fetch rooms from API
   useEffect(() => {
     const fetchRooms = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Ingen token hittades i localStorage");
+        return;
+      }
+
       try {
-        const res = await fetch(`${API_BASE_URL}/rooms`);
+        const res = await fetch(`${API_BASE_URL}/rooms`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error(`Fetch failed with status ${res.status}`);
         const data = await res.json();
         console.log("Fetched rooms:", data);
         setRooms(data);
@@ -64,17 +78,28 @@ const Dashboard: React.FC = () => {
         console.error("Error fetching rooms:", error);
       }
     };
+
     fetchRooms();
   }, []);
 
   // Create a new room
   const handleCreateRoom = async (roomData: Omit<Room, "id">) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE_URL}/rooms`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(roomData),
       });
+
       if (!res.ok) throw new Error("Failed to create room");
       const newRoom = await res.json();
       setRooms((prev) => [...prev, newRoom]);
@@ -84,22 +109,53 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Update an existing room
-  const handleUpdateRoom = async (room: Room) => {
-     const token = localStorage.getItem("token");
-  if (!token) {
-    console.warn("Ingen token hittades i localStorage");
-    return;
+
+  function getChangedFields<T>(original: T, updated: Partial<T>): Partial<T> {
+    const changed: Partial<T> = {};
+    for (const key in updated) {
+      if (updated[key] !== original[key]) {
+        changed[key] = updated[key];
+      }
+    }
+    return changed;
   }
+
+  const handleUpdateRoom = async (updatedRoomData: Partial<Room>) => {
+    if (!editingRoom) {
+      console.warn("Inget rum valt för redigering");
+      return;
+    }
+
+    const changedFields = getChangedFields(editingRoom, updatedRoomData);
+
+    if (Object.keys(changedFields).length === 0) {
+      setIsModalOpen(false);
+      setEditingRoom(null);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/rooms/${room.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
-        body: JSON.stringify(room),
+      const res = await fetch(`${API_BASE_URL}/rooms/${editingRoom.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(changedFields),
       });
+
       if (!res.ok) throw new Error("Failed to update room");
+
       const updatedRoom = await res.json();
-      setRooms((prev) => prev.map((r) => (r.id === updatedRoom.id ? updatedRoom : r)));
+      setRooms((prev) =>
+        prev.map((r) => (r.id === updatedRoom.id ? updatedRoom : r))
+      );
     } catch (error) {
       console.error("Error updating room:", error);
     } finally {
@@ -108,11 +164,26 @@ const Dashboard: React.FC = () => {
     }
   };
 
+
   // Delete a room
   const handleDeleteRoom = async (id: number) => {
     if (!window.confirm("Är du säker på att du vill ta bort detta rum?")) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/rooms/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE_URL}/rooms/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (!res.ok) throw new Error("Failed to delete room");
       setRooms((prev) => prev.filter((room) => room.id !== id));
     } catch (error) {

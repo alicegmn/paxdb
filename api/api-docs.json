@@ -197,9 +197,9 @@
       "description": "Skapar en ny bokning"
     },
     {
-      "method": "PUT",
+      "method": "PATCH",
       "path": "/bookings/:id",
-      "description": "Uppdaterar en bokning baserat på ID"
+      "description": "Uppdaterar valda fält för en bokning baserat på ID (partiell uppdatering)"
     },
     {
       "method": "DELETE",

@@ -4,47 +4,29 @@ import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
-/**
- * @swagger
- * /setup:
- *   get:
- *     summary: Initialize database and create tables
- *     description: Creates tables for users, rooms, bookings, and devices if they don't exist. Also seeds a default admin user.
- *     tags: [Setup]
- *     responses:
- *       200:
- *         description: Setup complete
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: "✅ Setup complete: Tables created and default admin checked."
- *       500:
- *         description: Setup failed
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: "❌ Setup failed. See server logs."
- */
-
 router.get("/setup", async (_req: Request, res: Response) => {
   try {
     console.log("🔧 Running setup script...");
 
-    // Create users table
+    await pool.query(`
+      ALTER TABLE users
+      DROP CONSTRAINT IF EXISTS users_role_check,
+      ADD CONSTRAINT users_role_check CHECK (role IN ('admin', 'user', 'moderator', 'devices'));
+      `);
+
+    // Users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        surname VARCHAR(100) NOT NULL,
-        email VARCHAR(150) UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'user', 'moderator'))
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      surname VARCHAR(100) NOT NULL,
+      email VARCHAR(150) UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'user', 'moderator', 'devices'))
       );
-    `);
+      `);
 
-    // Create rooms table
+    // Rooms table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS rooms (
         id SERIAL PRIMARY KEY,
@@ -64,7 +46,7 @@ router.get("/setup", async (_req: Request, res: Response) => {
       );
     `);
 
-    // Create bookings table
+    // Bookings table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS bookings (
         id SERIAL PRIMARY KEY,
@@ -75,7 +57,7 @@ router.get("/setup", async (_req: Request, res: Response) => {
       );
     `);
 
-    // Create devices table
+    // Devices table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS devices (
         id SERIAL PRIMARY KEY,
@@ -84,29 +66,61 @@ router.get("/setup", async (_req: Request, res: Response) => {
       );
     `);
 
-    // Create default admin if not exists
-    const adminEmail = "admin@pax.com";
-    const adminCheck = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [adminEmail]
-    );
-    if (adminCheck.rows.length === 0) {
-      const hashedPassword = await bcrypt.hash("admin123", 10);
-      await pool.query(
-        `INSERT INTO users (name, surname, email, password, role)
-         VALUES ($1, $2, $3, $4, $5)`,
-        ["Admin", "User", adminEmail, hashedPassword, "admin"]
+    // Users to seed
+    const usersToCreate = [
+      {
+        name: "Admin",
+        surname: "User",
+        email: "admin@pax.com",
+        password: "admin123",
+        role: "admin",
+      },
+      {
+        name: "Device",
+        surname: "Admin",
+        email: "devices@pax.com",
+        password: "device123",
+        role: "devices",
+      },
+      {
+        name: "Mod",
+        surname: "User",
+        email: "moderator@pax.com",
+        password: "mod123",
+        role: "moderator",
+      },
+      {
+        name: "Regular",
+        surname: "User",
+        email: "user@pax.com",
+        password: "user123",
+        role: "user",
+      },
+    ];
+
+    for (const user of usersToCreate) {
+      const existing = await pool.query(
+        "SELECT * FROM users WHERE email = $1",
+        [user.email]
       );
-      console.log("✅ Default admin user created (admin@pax.com / admin123)");
+      if (existing.rows.length === 0) {
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        await pool.query(
+          `INSERT INTO users (name, surname, email, password, role)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [user.name, user.surname, user.email, hashedPassword, user.role]
+        );
+        console.log(
+          `${user.role} user created (${user.email} / ${user.password})`
+        );
+      }
     }
 
-    console.log("✅ Tables created (if not already existing).");
-    res
-      .status(200)
-      .send("✅ Setup complete: Tables created and default admin checked.");
+    console.log("Tables created and users seeded.");
+    res.status(200).send("Setup complete: Tables created and users added.");
   } catch (err) {
-    console.error("❌ Setup error:", err);
-    res.status(500).send("❌ Setup failed. See server logs.");
+    console.error("Setup error:", err);
+    res.status(500).send("Setup failed. See server logs.");
   }
 });
 

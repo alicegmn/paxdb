@@ -1,7 +1,7 @@
 import express from "express";
 import authenticateToken, {
   AuthenticatedRequest,
-} from "../middlewares/authMiddleware.ts";
+} from "../middlewares/authMiddleware";
 import requireRole from "../middlewares/requireRole";
 
 const router = express.Router();
@@ -41,7 +41,7 @@ const router = express.Router();
 router.get(
   "/dashboard",
   authenticateToken,
-  requireRole("admin"),
+  requireRole(["admin", "moderator"]),
   (req: AuthenticatedRequest, res) => {
     res.json({ message: "Welcome to the admin dashboard", user: req.user });
   }

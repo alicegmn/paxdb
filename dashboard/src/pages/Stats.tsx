@@ -62,7 +62,7 @@ const usageData: UsageDatum[] = [
 ];
 
 const Stats: React.FC = () => {
-  const API_BASE_URL = "http://localhost:13000";
+  const API_BASE_URL = "https://paxdb.vercel.app";
   const [stats, setStats] = useState<UsageDatum[]>([]);
 
   useEffect(() => {

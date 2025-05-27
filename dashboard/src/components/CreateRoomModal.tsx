@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from "react";
 import Button from "./Button";
 
-type Room = {
+export type Room = {
     id: number;
     name: string;
     description?: string;
@@ -24,8 +24,8 @@ type Device = {
 type CreateRoomModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    onCreate: (room: Omit<Room, "id">) => void;
-    onEdit?: (room: Room) => void;
+    onCreate: (room: Omit<Room, "id">) => Promise<void>;
+    onEdit?: (room: Partial<Room> & { id: number }) => Promise<void>;
     roomToEdit?: Room;
 };
 
@@ -52,13 +52,19 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         deviceId: null,
     });
 
-    // Hämta unassigned enheter när modalen öppnas
     useEffect(() => {
         if (!isOpen) return;
 
         const fetchDevices = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                console.warn("Ingen token hittades i localStorage");
+                return;
+            }
             try {
-                const res = await fetch("http://localhost:13000/config/devices/unassigned");
+                const res = await fetch("https://paxdb.vercel.app/config/devices/unassigned", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 if (!res.ok) throw new Error("Failed to fetch devices");
                 const data: Device[] = await res.json();
                 setAvailableDevices(data);
@@ -70,14 +76,13 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         fetchDevices();
     }, [isOpen]);
 
-    // Sätt formvärden om vi redigerar rum
     useEffect(() => {
         if (roomToEdit) {
             const { id, ...rest } = roomToEdit;
-            setForm((prev) => ({
+            setForm({
                 ...rest,
-                deviceId: prev.deviceId ?? null,
-            }));
+                deviceId: null,
+            });
         } else {
             setForm({
                 name: "",
@@ -96,7 +101,6 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         }
     }, [roomToEdit]);
 
-    // Hantera inputändringar (förutom select)
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type, checked } = e.target;
         setForm((prev) => ({
@@ -105,74 +109,55 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         }));
     };
 
-    // Hantera device dropdown ändring och PUT direkt om vi redigerar befintligt rum
-    const handleDeviceChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleDeviceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
         const deviceId = value ? Number(value) : null;
+        setForm((prev) => ({ ...prev, deviceId }));
+    };
 
-        setForm((prev) => ({
-            ...prev,
-            deviceId,
-        }));
+    const assignDeviceToRoom = async (deviceId: number, roomId: number) => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.warn("Ingen token hittades i localStorage");
+            return;
+        }
 
-        // Om vi redigerar befintligt rum (roomToEdit med id), koppla enheten direkt
-        if (deviceId && roomToEdit?.id) {
-            try {
-                const res = await fetch(`http://localhost:13000/config/${deviceId}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ roomId: roomToEdit.id }),
-                });
-                if (!res.ok) {
-                    console.error("Failed to assign device to room");
-                }
-            } catch (error) {
-                console.error("Error assigning device to room:", error);
+        const device = availableDevices.find((d) => d.id === deviceId);
+        if (!device) {
+            console.error("Device not found");
+            return;
+        }
+
+        try {
+            const res = await fetch(`https://paxdb.vercel.app/config/${device.serial_number}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ roomId }),
+            });
+
+            if (!res.ok) {
+                console.error("Failed to assign device to room");
             }
+        } catch (error) {
+            console.error("Error assigning device to room:", error);
         }
     };
 
     const handleSubmit = async () => {
-        const room: Room = {
-            id: roomToEdit?.id ?? Date.now(),
-            ...form,
-        };
-
-        try {
-            if (roomToEdit && onEdit) {
-                await onEdit(room);
-            } else if (onCreate) {
-                await onCreate(room);
-            }
-
-            if (form.deviceId) {
-                // Hitta device baserat på deviceId
-                const device = availableDevices.find(d => d.id === form.deviceId);
-                if (!device) {
-                    console.error("Device not found");
-                    return;
-                }
-
-                const serialNumber = device.serial_number;
-
-                const res = await fetch(`http://localhost:13000/config/${serialNumber}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ roomId: room.id }),
-                });
-
-                if (!res.ok) {
-                    console.error("Failed to assign device to room");
-                }
-            }
-            onClose();
-        } catch (error) {
-            console.error("Error submitting form:", error);
+        const { deviceId, ...roomData } = form;
+        if (roomToEdit && onEdit) {
+            // Uppdatera rum
+            await onEdit({ ...roomData, id: roomToEdit.id });
+            if (deviceId) await assignDeviceToRoom(deviceId, roomToEdit.id);
+        } else if (onCreate) {
+            // Skapa nytt rum
+            await onCreate(roomData);
+            // Notera: här kan du lägga till assignDeviceToRoom om API:et returnerar det skapade rummets id
         }
+        onClose();
     };
 
     if (!isOpen) return null;
@@ -182,11 +167,8 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
             <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md space-y-4">
                 <h2 className="text-xl font-semibold">{roomToEdit ? "Redigera rum" : "Skapa nytt rum"}</h2>
 
-                {/* Namn */}
                 <div className="space-y-2">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                        Rum Namn
-                    </label>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Rum Namn</label>
                     <input
                         id="name"
                         className="w-full border rounded p-2"
@@ -197,11 +179,8 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                     />
                 </div>
 
-                {/* Beskrivning */}
                 <div className="space-y-2">
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                        Beskrivning
-                    </label>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Beskrivning</label>
                     <textarea
                         id="description"
                         className="w-full border rounded p-2"
@@ -212,12 +191,9 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                     />
                 </div>
 
-                {/* Våning, Stolar */}
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
-                        <label htmlFor="floor" className="block text-sm font-medium text-gray-700">
-                            Våning
-                        </label>
+                        <label htmlFor="floor" className="block text-sm font-medium text-gray-700">Våning</label>
                         <input
                             id="floor"
                             type="number"
@@ -230,12 +206,10 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="chairs" className="block text-sm font-medium text-gray-700">
-                            Stolar
-                        </label>
+                        <label htmlFor="chairs" className="block text-sm font-medium text-gray-700">Stolar</label>
                         <input
                             id="chairs"
-                            type="text"
+                            type="number"
                             className="border rounded p-2"
                             placeholder="Stolar"
                             name="chairs"
@@ -245,7 +219,6 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                     </div>
                 </div>
 
-                {/* Checkboxar: Skärm, Whiteboard, Projektor */}
                 <div className="grid grid-cols-2 gap-2 text-sm">
                     <label className="flex items-center space-x-2">
                         <input type="checkbox" name="screen" checked={form.screen} onChange={handleChange} />
@@ -260,7 +233,6 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                         <span>Projektor</span>
                     </label>
                 </div>
-
 
                 {roomToEdit && (
                     <div className="space-y-2">
@@ -284,11 +256,8 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                     </div>
                 )}
 
-                {/* Knapp för att skicka formuläret */}
                 <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={onClose}>
-                        Avbryt
-                    </Button>
+                    <Button variant="outline" onClick={onClose}>Avbryt</Button>
                     <Button onClick={handleSubmit}>{roomToEdit ? "Spara ändringar" : "Skapa"}</Button>
                 </div>
             </div>
