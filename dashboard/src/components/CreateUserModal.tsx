@@ -64,34 +64,36 @@ const CreateUserModal: FC<CreateUserModalProps> = ({ isOpen, onClose, onCreate, 
             onClose();
             return;
         }
-    const token = localStorage.getItem("token");
+
+        onCreate(form);
+    // const token = localStorage.getItem("token");
         
-    if (!token) {
-        console.warn("Ingen token hittades i localStorage");
-        return;
-        }
+    // if (!token) {
+    //     console.warn("Ingen token hittades i localStorage");
+    //     return;
+    //     }
 
-        try {
-            const res = await fetch("https://paxdb.vercel.app/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                     Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(form),
-            });
+    //     try {
+    //         const res = await fetch("https://paxdb.vercel.app/auth/register", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                  Authorization: `Bearer ${token}`,
+    //             },
+    //             body: JSON.stringify(form),
+    //         });
 
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.message || "Failed to create user");
-            }
+    //         if (!res.ok) {
+    //             const errorData = await res.json();
+    //             throw new Error(errorData.message || "Failed to create user");
+    //         }
 
-            const data = await res.json();
-            console.log("User created:", data.user);
-            onClose();
-        } catch (error) {
-            console.error("Error creating user:", error);
-        }
+    //         const data = await res.json();
+    //         console.log("User created:", data.user);
+    //         onClose();
+    //     } catch (error) {
+    //         console.error("Error creating user:", error);
+    //     }
     };
 
 

@@ -10,17 +10,26 @@
 
 [Projektplan](https://github.com/Kusten-ar-klar-Chas-Challenge-2025/pax/blob/main/PROJEKTPLAN.md)
 
-## How to start server
+## Getting Started
 
-1. Download and install docker desktop
-2. In terminal enter cd pax/backend/backend and run command: docker build -t my-node-app .
-3. run docker-compose up
-4. type this in url http://localhost:13000/setup (sets up DB table)
-5. Enjoy the api
+## Backend
+Our backend is now hosted on PaxDB:
+Base URL: https://paxdb.vercel.app
 
-# API Documentation
 
-Base URL: `http://localhost:{PORT}` (default port: 13000)
+## Frontend
+To run the frontend locally:
+
+1. Clone the repo
+
+2. Install dependencies:
+- npm install
+
+3. Start the frontend server:
+- npm run dev
+  
+4. Access it at:
+http://localhost:5173
 
 ---
 
@@ -34,11 +43,42 @@ After successful registration or login a JWT token is issued with the users id, 
 
 The token is signed with a secret key (JWT_secret) and has 1 hour expiration time
 
+To access protected endpoints such as `/users`, you need to log in and obtain a Bearer Token.
 
+### Login via Postman
+POST `https://paxdb.vercel.app/auth/login`
+#### Headers:
+`Content-Type: application/json`
+
+#### Body (JSON)
+```json
+    {
+  "email": "admin@pax.com",
+  "password": "admin123"
+}
+
+```
+#### Response:
+```json
+   {
+  "token": "your_jwt_token_here"
+}
+```
+#### Use Bearer Token
+For subsequent requests to protected endpoints, include the token in the Authorization header:
+`Authorization: Bearer your_jwt_token_here`
 
 ---
 
 ## Endpoints
+
+#### Get all Users
+GET `https://paxdb.vercel.app/users`
+Requires Bearer Token
+
+#### Get all Rooms
+GET `https://paxdb.vercel.app/rooms`
+Public endpoint (no token needed)
 
 ### 1. Setup Database Table
 
@@ -249,5 +289,5 @@ Retrieve a list of all rooms.
 - **Example Request:**
 
   ```bash
-  curl http://localhost:13000/rooms
+  curl http://localhost:5173/dashboard
   ```
