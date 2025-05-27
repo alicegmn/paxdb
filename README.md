@@ -43,11 +43,42 @@ After successful registration or login a JWT token is issued with the users id, 
 
 The token is signed with a secret key (JWT_secret) and has 1 hour expiration time
 
+To access protected endpoints such as `/users`, you need to log in and obtain a Bearer Token.
 
+### Login via Postman
+POST `https://paxdb.vercel.app/auth/login`
+#### Headers:
+`Content-Type: application/json`
+
+#### Body (JSON)
+```json
+    {
+  "email": "admin@pax.com",
+  "password": "admin123"
+}
+
+```
+#### Response:
+```json
+   {
+  "token": "your_jwt_token_here"
+}
+```
+#### Use Bearer Token
+For subsequent requests to protected endpoints, include the token in the Authorization header:
+`Authorization: Bearer your_jwt_token_here`
 
 ---
 
 ## Endpoints
+
+#### Get all Users
+GET `https://paxdb.vercel.app/users`
+Requires Bearer Token
+
+#### Get all Rooms
+GET `https://paxdb.vercel.app/rooms`
+Public endpoint (no token needed)
 
 ### 1. Setup Database Table
 
