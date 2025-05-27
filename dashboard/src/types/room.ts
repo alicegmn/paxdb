@@ -11,6 +11,7 @@ export type Room = {
   projector: boolean;
   temperature: number;
   activity: boolean;
+  time: number;
 };
 
 export type Device = {
