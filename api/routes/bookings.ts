@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import pool from "../db";
 import asyncHandler from "../middlewares/asyncHandler";
-import authenticateToken from "../middlewares/authMiddleware";
+// import authenticateToken from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
@@ -57,7 +57,6 @@ type CreateBookingInput = Omit<Booking, "id">;
 // GET all bookings with room name and user email
 router.get(
   "/",
-  authenticateToken,
   asyncHandler(async (_req: Request, res: Response) => {
     const result = await pool.query(`
       SELECT 
@@ -71,7 +70,7 @@ router.get(
 
     res.status(200).json(result.rows);
   })
-);
+); // Lägg till authenticateToken,
 
 /**
  * @swagger
@@ -97,7 +96,6 @@ router.get(
 // GET a single booking by ID
 router.get(
   "/:id",
-  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await pool.query("SELECT * FROM bookings WHERE id = $1", [
@@ -108,7 +106,7 @@ router.get(
     }
     res.status(200).json(result.rows[0]);
   })
-);
+); // Lägg till authenticateToken,
 
 /**
  * @swagger
@@ -146,7 +144,6 @@ router.get(
 // POST a new booking with foreign key validation
 router.post(
   "/",
-  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { room_id, user_id, start_time, end_time }: CreateBookingInput =
       req.body;
@@ -172,7 +169,8 @@ router.post(
 
     res.status(201).json(result.rows[0]);
   })
-);
+); // Lägg till authenticateToken,
+
 /**
  * @swagger
  * /bookings/{id}:
@@ -216,7 +214,6 @@ router.post(
 // PUT update booking
 router.patch(
   "/:id",
-  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { room_id, user_id, start_time, end_time } = req.body;
@@ -274,7 +271,7 @@ router.patch(
 
     res.status(200).json(result.rows[0]);
   })
-);
+); // Lägg till authenticateToken,
 
 /**
  * @swagger
@@ -300,7 +297,6 @@ router.patch(
 // DELETE a booking
 router.delete(
   "/:id",
-  authenticateToken,
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await pool.query(
@@ -312,6 +308,6 @@ router.delete(
     }
     res.status(204).send();
   })
-);
+); // Lägg till authenticateToken,
 
 export default router;

@@ -115,7 +115,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Room'
  */
-router.get("/", authenticateToken, asyncHandler(getAllRooms));
+router.get("/", asyncHandler(getAllRooms)); // authenticateToken
 
 /**
  * @swagger
@@ -141,7 +141,7 @@ router.get("/", authenticateToken, asyncHandler(getAllRooms));
  *       404:
  *         description: Room not found
  */
-router.get("/:id", authenticateToken, asyncHandler(getRoomById));
+router.get("/:id", asyncHandler(getRoomById)); //authenticateToken;
 
 /**
  * @swagger
