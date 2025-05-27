@@ -6,6 +6,7 @@ import limiter from "./middlewares/rateLimiter";
 import errorHandler from "./middlewares/errorHandler";
 import bcrypt from "bcryptjs";
 import asyncHandler from "./middlewares/asyncHandler";
+import removePortMiddleware from "./middlewares/portHandler";
 
 // routes
 import setupRoutes from "./routes/setup";
@@ -20,9 +21,9 @@ import deviceConfigRoutes from "./routes/deviceConfig"
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 13000;
+app.use(removePortMiddleware);
 app.use(express.json());
 app.use(limiter); // allows limiter on all routes
-
 // allow requests from frontend and deployed app
 app.use(
   cors({
