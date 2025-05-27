@@ -54,13 +54,13 @@ const Dashboard: React.FC = () => {
 
   // Fetch rooms from API
   useEffect(() => {
-    const fetchRooms = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("Ingen token hittades i localStorage");
-        return;
-      }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
 
+    const fetchRooms = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/rooms`, {
           method: "GET",
@@ -80,6 +80,12 @@ const Dashboard: React.FC = () => {
     };
 
     fetchRooms();
+
+    const intervalId = setInterval(() => {
+      fetchRooms();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   // Create a new room
