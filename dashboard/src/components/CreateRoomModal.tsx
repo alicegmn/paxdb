@@ -57,8 +57,18 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         if (!isOpen) return;
 
         const fetchDevices = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                console.warn("Ingen token hittades i localStorage");
+                return;
+            }
+
             try {
-                const res = await fetch("http://localhost:13000/config/devices/unassigned");
+                const res = await fetch("https://paxdb.vercel.app/config/devices/unassigned", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (!res.ok) throw new Error("Failed to fetch devices");
                 const data: Device[] = await res.json();
                 setAvailableDevices(data);
@@ -96,7 +106,6 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         }
     }, [roomToEdit]);
 
-    // Hantera inputändringar (förutom select)
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type, checked } = e.target;
         setForm((prev) => ({
@@ -105,7 +114,6 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         }));
     };
 
-    // Hantera device dropdown ändring och PUT direkt om vi redigerar befintligt rum
     const handleDeviceChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const value = e.target.value;
         const deviceId = value ? Number(value) : null;
@@ -115,18 +123,40 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
             deviceId,
         }));
 
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.warn("Ingen token hittades i localStorage");
+            return;
+        }
+
         // Om vi redigerar befintligt rum (roomToEdit med id), koppla enheten direkt
         if (deviceId && roomToEdit?.id) {
             try {
-                const res = await fetch(`http://localhost:13000/config/${deviceId}`, {
+                // Hitta device för serial_number
+                const device = availableDevices.find(d => d.id === deviceId);
+                if (!device) {
+                    console.error("Device not found");
+                    return;
+                }
+
+                const res = await fetch(`https://paxdb.vercel.app/config/${device.serial_number}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({ roomId: roomToEdit.id }),
                 });
+
                 if (!res.ok) {
                     console.error("Failed to assign device to room");
+                } else {
+
+                    if (onEdit) {
+
+                        const updatedRoom = { ...roomToEdit, deviceId };
+                        onEdit(updatedRoom);
+                    }
                 }
             } catch (error) {
                 console.error("Error assigning device to room:", error);
@@ -134,7 +164,14 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
         }
     };
 
+
     const handleSubmit = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.warn("Ingen token hittades i localStorage");
+            return;
+        }
+
         const room: Room = {
             id: roomToEdit?.id ?? Date.now(),
             ...form,
@@ -149,7 +186,7 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
 
             if (form.deviceId) {
                 // Hitta device baserat på deviceId
-                const device = availableDevices.find(d => d.id === form.deviceId);
+                const device = availableDevices.find((d) => d.id === form.deviceId);
                 if (!device) {
                     console.error("Device not found");
                     return;
@@ -157,10 +194,11 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
 
                 const serialNumber = device.serial_number;
 
-                const res = await fetch(`http://localhost:13000/config/${serialNumber}`, {
+                const res = await fetch(`https://paxdb.vercel.app/config/${serialNumber}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({ roomId: room.id }),
                 });
@@ -260,7 +298,6 @@ const CreateRoomModal: FC<CreateRoomModalProps> = ({
                         <span>Projektor</span>
                     </label>
                 </div>
-
 
                 {roomToEdit && (
                     <div className="space-y-2">

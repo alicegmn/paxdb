@@ -66,7 +66,7 @@ const CreateUserModal: FC<CreateUserModalProps> = ({ isOpen, onClose, onCreate, 
         }
 
         try {
-            const res = await fetch("http://localhost:13000/auth/register", {
+            const res = await fetch("https://paxdb.vercel.app/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
