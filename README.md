@@ -4,7 +4,7 @@
 
 ## Team: Kusten är klar - Chas Challenge 2025
 
-![Pax image](PAX_Kusten_är_klar_PG2.png)
+![Pax image](PAX.png)
 
 PAX är ett automatiserat rumsbokningssystem som förenklar vardagen på kontoret. Via en mobilapp kan medarbetare boka, se och hantera sina rumsbokningar, medan administratörer får full kontroll via en webbaserad dashboard. Systemet använder sensorer för att upptäcka närvaro i rummen och kan automatiskt boka eller avboka rum baserat på faktisk användning. PAX sparar tid och resurser, ökar tillgängligheten av rum och bidrar till ett smartare och mer hållbart kontorsflöde.
 
