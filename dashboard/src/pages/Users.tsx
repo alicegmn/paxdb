@@ -12,21 +12,46 @@ const Users: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await fetch(`${API_BASE_URL}/users`);
+  //       const data = await res.json();
+  //       console.log(data);
+  //       setUsers(Array.isArray(data) ? data : data.users);
+  //       // console.log(data);
+  //       // setUsers(data);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/users`);
-        const data = await res.json();
-        console.log(data);
-        setUsers(Array.isArray(data) ? data : data.users);
-        console.log(data);
+  const fetchData = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users`);
+      const data = await res.json();
+      console.log("API response:", JSON.stringify(data, null, 2));
+
+      if (Array.isArray(data)) {
         setUsers(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } else if (data && Array.isArray(data.users)) {
+        setUsers(data.users);
+      } else {
+        console.warn("Unexpected data format:", data);
+        setUsers([]); // fallback to avoid runtime errors
       }
-    };
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setUsers([]); // fallback on fetch failure
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   console.log(users);
 

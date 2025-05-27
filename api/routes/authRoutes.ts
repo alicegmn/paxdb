@@ -69,65 +69,65 @@ const allowedRoles = ["admin", "user", "moderator", "devices"];
  */
 
 // // POST /register
-// router.post(
-//   "/register",
-//   asyncHandler(async (req: Request, res: Response) => {
-//     const {
-//       name,
-//       surname,
-//       email,
-//       password,
-//       role,
-//     }: { name: string; surname: string; email: string; password: string; role?: string } = req.body;
+router.post(
+  "/register",
+  asyncHandler(async (req: Request, res: Response) => {
+    const {
+      name,
+      surname,
+      email,
+      password,
+      role,
+    }: { name: string; surname: string; email: string; password: string; role?: string } = req.body;
 
-//     // Validate role
-//     if (role && !allowedRoles.includes(role)) {
-//       return res.status(400).json({
-//         message: "Invalid role. Allowed roles are: admin, user, moderator and devices.",
-//       });
-//     }
+    // Validate role
+    if (role && !allowedRoles.includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role. Allowed roles are: admin, user, moderator and devices.",
+      });
+    }
 
-//     try {
-//       const existingUser = await pool.query(
-//         "SELECT * FROM users WHERE email = $1",
-//         [email]
-//       );
-//       if (existingUser.rows.length > 0) {
-//         return res.status(409).json({ message: "Username is already taken" });
-//       }
+    try {
+      const existingUser = await pool.query(
+        "SELECT * FROM users WHERE email = $1",
+        [email]
+      );
+      if (existingUser.rows.length > 0) {
+        return res.status(409).json({ message: "Username is already taken" });
+      }
 
-//       const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-//       const result = await pool.query(
-//         "INSERT INTO users (name, surname, email, password, role) VALUES ($1, $2, $3) RETURNING id, name, surname, email, role",
-//         [name, surname, email, hashedPassword, role || "user"]
-//       );
+      const result = await pool.query(
+        "INSERT INTO users (name, surname, email, password, role) VALUES ($1, $2, $3) RETURNING id, name, surname, email, role",
+        [name, surname, email, hashedPassword, role || "user"]
+      );
 
-//       const newUser: User = result.rows[0];
+      const newUser: User = result.rows[0];
 
-//       const token = jwt.sign(
-//         {
-//           id: newUser.id,
-//           email: newUser.email,
-//           role: newUser.role,
-//         } as JwtPayload,
-//         process.env.JWT_SECRET as string,
-//         { expiresIn: "1h" }
-//       );
+      const token = jwt.sign(
+        {
+          id: newUser.id,
+          email: newUser.email,
+          role: newUser.role,
+        } as JwtPayload,
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1h" }
+      );
 
-//       res.status(201).json({
-//         message: "User registered successfully",
-//         token,
-//         user: newUser,
-//       });
-//     } catch (err: any) {
-//       console.error("Registration error:", err);
-//       res
-//         .status(500)
-//         .json({ message: "Registration failed", error: err.message });
-//     }
-//   })
-// );
+      res.status(201).json({
+        message: "User registered successfully",
+        token,
+        user: newUser,
+      });
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      res
+        .status(500)
+        .json({ message: "Registration failed", error: err.message });
+    }
+  })
+);
 
 /**
  * @swagger
@@ -169,57 +169,57 @@ const allowedRoles = ["admin", "user", "moderator", "devices"];
  *         description: Registration failed
  */
 
-router.post(
-  "/register",
-  asyncHandler(async (req: Request, res: Response) => {
-    const {
-      email,
-      password,
-      name,
-      surname,
-      role,
-    }: {
-      email: string;
-      password: string;
-      name: string;
-      surname: string;
-      role?: string;
-    } = req.body;
-    if (role && !allowedRoles.includes(role)) {
-      return res.status(400).json({
-        message:
-          "Invalid role. Allowed roles are: admin, user, moderator and devices.",
-      });
-    }
-    const existingUser = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-    if (existingUser.rows.length > 0) {
-      return res.status(409).json({ message: "Email is already registered" });
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await pool.query(
-      "INSERT INTO users (email, password, name, surname, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, surname, role",
-      [email, hashedPassword, name, surname, role || "user"]
-    );
-    const newUser = result.rows[0];
-    const token = jwt.sign(
-      {
-        id: newUser.id,
-        email: newUser.email,
-        role: newUser.role,
-      },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    );
-    res.status(201).json({
-      message: "User registered successfully",
-      token,
-      user: newUser,
-    });
-  })
-);
+// router.post(
+//   "/register",
+//   asyncHandler(async (req: Request, res: Response) => {
+//     const {
+//       email,
+//       password,
+//       name,
+//       surname,
+//       role,
+//     }: {
+//       email: string;
+//       password: string;
+//       name: string;
+//       surname: string;
+//       role?: string;
+//     } = req.body;
+//     if (role && !allowedRoles.includes(role)) {
+//       return res.status(400).json({
+//         message:
+//           "Invalid role. Allowed roles are: admin, user, moderator and devices.",
+//       });
+//     }
+//     const existingUser = await pool.query(
+//       "SELECT * FROM users WHERE email = $1",
+//       [email]
+//     );
+//     if (existingUser.rows.length > 0) {
+//       return res.status(409).json({ message: "Email is already registered" });
+//     }
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const result = await pool.query(
+//       "INSERT INTO users (email, password, name, surname, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, surname, role",
+//       [email, hashedPassword, name, surname, role || "user"]
+//     );
+//     const newUser = result.rows[0];
+//     const token = jwt.sign(
+//       {
+//         id: newUser.id,
+//         email: newUser.email,
+//         role: newUser.role,
+//       },
+//       process.env.JWT_SECRET as string,
+//       { expiresIn: "1h" }
+//     );
+//     res.status(201).json({
+//       message: "User registered successfully",
+//       token,
+//       user: newUser,
+//     });
+//   })
+// );
 
 // POST /login
 // router.post(
