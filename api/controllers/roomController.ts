@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import pool from "../db";
-import { format, utcToZonedTime } from "date-fns-tz";
+import { format, toZonedTime } from "date-fns-tz";
 
 const swedishTimeZone = "Europe/Stockholm";
 
@@ -11,7 +11,7 @@ export const getAllRooms = async (_req: Request, res: Response) => {
   res.status(200).json(
     result.rows.map(room => {
       const localTime = format(
-        utcToZonedTime(nowUtc, swedishTimeZone),
+        toZonedTime(nowUtc, swedishTimeZone),
         "yyyy-MM-dd'T'HH:mm:ssXXX",
         { timeZone: swedishTimeZone }
       );
@@ -34,7 +34,7 @@ export const getRoomById = async (req: Request, res: Response) => {
   const room = result.rows[0];
   const nowUtc = new Date();
   const localTime = format(
-    utcToZonedTime(nowUtc, swedishTimeZone),
+    toZonedTime(nowUtc, swedishTimeZone),
     "yyyy-MM-dd'T'HH:mm:ssXXX",
     { timeZone: swedishTimeZone }
   );
@@ -44,6 +44,7 @@ export const getRoomById = async (req: Request, res: Response) => {
     time: localTime,
   });
 };
+
 export const createRoom = async (req: Request, res: Response) => {
   const {
     name,
