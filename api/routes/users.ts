@@ -75,7 +75,7 @@ router.post(
  *         description: Error fetching users
  */
 router.get(
-  "/:id",
+  "/",
   authenticateToken,
   requireRole(["admin", "moderator"]),
   asyncHandler(getAllUsers)
