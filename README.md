@@ -10,17 +10,26 @@
 
 [Projektplan](https://github.com/Kusten-ar-klar-Chas-Challenge-2025/pax/blob/main/PROJEKTPLAN.md)
 
-## How to start server
+## Getting Started
 
-1. Download and install docker desktop
-2. In terminal enter cd pax/backend/backend and run command: docker build -t my-node-app .
-3. run docker-compose up
-4. type this in url http://localhost:13000/setup (sets up DB table)
-5. Enjoy the api
+## Backend
+Our backend is now hosted on PaxDB:
+Base URL: https://paxdb.vercel.app
 
-# API Documentation
 
-Base URL: `http://localhost:{PORT}` (default port: 13000)
+## Frontend
+To run the frontend locally:
+
+1. Clone the repo
+
+2. Install dependencies:
+- npm install
+
+3. Start the frontend server:
+- npm run dev
+  
+4. Access it at:
+http://localhost:5173
 
 ---
 
@@ -249,5 +258,5 @@ Retrieve a list of all rooms.
 - **Example Request:**
 
   ```bash
-  curl http://localhost:13000/rooms
+  curl http://localhost:5173/dashboard
   ```
