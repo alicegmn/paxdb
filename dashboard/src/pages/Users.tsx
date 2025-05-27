@@ -12,28 +12,18 @@ const Users: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await fetch(`${API_BASE_URL}/users`);
-  //       const data = await res.json();
-  //       console.log(data);
-  //       setUsers(Array.isArray(data) ? data : data.users);
-  //       // console.log(data);
-  //       // setUsers(data);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
-
   useEffect(() => {
   const fetchData = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/users`);
+      const token = localStorage.getItem("token"); 
+      const res = await fetch(`${API_BASE_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       console.log("API response:", JSON.stringify(data, null, 2));
+      
 
       if (Array.isArray(data)) {
         setUsers(data);
@@ -93,9 +83,10 @@ const Users: React.FC = () => {
     // create new user 
   const handleCreateUser = async (userData: Omit<User, "id">) => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/users`, {
          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
           body: JSON.stringify(userData),
       });
         if (!res.ok) throw new Error("Failed to create user");
@@ -110,9 +101,10 @@ const Users: React.FC = () => {
   // update an existing user
   const handleUpdateUser = async (user: User) => {
   try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/users/${user.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,  },
         body: JSON.stringify(user),
       });
       if (!res.ok) throw new Error("Failed to update user");
@@ -130,7 +122,10 @@ const Users: React.FC = () => {
   const handleDeleteUser = async (id: number) => {
      if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/users/${id}`, { method: "DELETE" });
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/users/${id}`, { 
+        method: "DELETE", 
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`,  }, });
       if (!res.ok) throw new Error("Failed to delete user");
       setUsers((prev) => prev.filter((user) => user.id !== id));
     } catch (error) {
