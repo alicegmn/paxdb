@@ -84,12 +84,22 @@ const Dashboard: React.FC = () => {
 
   // Create a new room
   const handleCreateRoom = async (roomData: Omit<Room, "id">) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE_URL}/rooms`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(roomData),
       });
+
       if (!res.ok) throw new Error("Failed to create room");
       const newRoom = await res.json();
       setRooms((prev) => [...prev, newRoom]);
@@ -121,8 +131,22 @@ const Dashboard: React.FC = () => {
   // Delete a room
   const handleDeleteRoom = async (id: number) => {
     if (!window.confirm("Är du säker på att du vill ta bort detta rum?")) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Ingen token hittades i localStorage");
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/rooms/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE_URL}/rooms/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (!res.ok) throw new Error("Failed to delete room");
       setRooms((prev) => prev.filter((room) => room.id !== id));
     } catch (error) {
