@@ -86,10 +86,15 @@ const Dashboard: React.FC = () => {
 
   // Update an existing room
   const handleUpdateRoom = async (room: Room) => {
+     const token = localStorage.getItem("token");
+  if (!token) {
+    console.warn("Ingen token hittades i localStorage");
+    return;
+  }
     try {
       const res = await fetch(`${API_BASE_URL}/rooms/${room.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
         body: JSON.stringify(room),
       });
       if (!res.ok) throw new Error("Failed to update room");
