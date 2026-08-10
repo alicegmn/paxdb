@@ -4,3 +4,4 @@ dist/
 package-lock.json
 .vercel
 .DS_Store
+.env.development.local
